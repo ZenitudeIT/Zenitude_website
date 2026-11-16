@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // An admin is any signed-in user with a document at admins/{uid}.
+    // Create those documents by hand in the Firebase console.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+
+    // Website content: everyone can read, only admins can change it.
+    match /site/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+      match /history/{id} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    // Contact form: anyone can CREATE a well-formed enquiry; only admins can read/manage.
+    match /enquiries/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['name', 'email', 'phone', 'interest', 'date', 'guests', 'message', 'status', 'createdAt'])
+        && str(request.resource.data.name, 1, 120)
+        && str(request.resource.data.email, 5, 160)
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && str(request.resource.data.message, 1, 4000)
+        && (!('phone' in request.resource.data) || str(request.resource.data.phone, 0, 40))
+        && (!('interest' in request.resource.data) || str(request.resource.data.interest, 0, 120))
+        && (!('date' in request.resource.data) || str(request.resource.data.date, 0, 10))
+        && (!('guests' in request.resource.data) || request.resource.data.guests is int || request.resource.data.guests == '')
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Admin list: a user may only check their own entry. Nobody can write from the website.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}

@@ -1,0 +1,235 @@
+/* =========================================================
+   ZenStore — the ONLY place the website talks to data.
+   ---------------------------------------------------------
+   • No Firebase config  → "local" mode: content comes from data/content.js,
+     admin edits are kept in this browser (localStorage). Good for building
+     and previewing; use Backups → "Download content.js" to publish.
+   • Firebase configured → content in Firestore, images in Storage,
+     admin login with Firebase Authentication. Nothing else changes.
+   ========================================================= */
+(function () {
+  'use strict';
+
+  const cfg = window.ZEN_FIREBASE_CONFIG;
+  const MODE = cfg && cfg.apiKey ? 'firebase' : 'local';
+  const DEFAULT = window.ZEN_DEFAULT_CONTENT || {};
+  const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const nowISO = () => new Date().toISOString();
+
+  /* ---------- shared: resize an image file in the browser ---------- */
+  function resizeImage(file, max = 2400, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) return reject(new Error('Only JPG, PNG, WebP or GIF images are allowed.'));
+      if (file.size > 15 * 1024 * 1024) return reject(new Error('Images must be under 15 MB.'));
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const r = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.round(img.width * r), h = Math.round(img.height * r);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const type = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        canvas.toBlob((blob) => blob ? resolve({ blob, type, w, h }) : reject(new Error('Could not process the image.')), type, quality);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('This file is not a readable image.')); };
+      img.src = url;
+    });
+  }
+  const blobToDataURL = (blob) => new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(blob); });
+  const safeName = (name, ext) => (String(name).replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'image') + '-' + uid().slice(-6) + '.' + ext;
+
+  /* =========================================================
+     LOCAL ADAPTER (browser storage)
+     ========================================================= */
+  const LS = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) {
+      try { localStorage.setItem(k, JSON.stringify(v)); }
+      catch (e) { throw new Error('Browser storage is full. Remove some uploaded images, or connect Firebase.'); }
+    },
+  };
+  let localUser = null;
+  const localAuthListeners = [];
+
+  const local = {
+    mode: 'local',
+    async getContent() { return clone(LS.get('zen:content', null) || DEFAULT); },
+    async saveContent(c, by) {
+      const prev = LS.get('zen:content', null) || DEFAULT;
+      {
+        const hist = LS.get('zen:history', []);
+        hist.unshift({ id: uid(), savedAt: nowISO(), by: by || '', json: JSON.stringify(prev) });
+        LS.set('zen:history', hist.slice(0, 15));
+      }
+      LS.set('zen:content', c);
+      return clone(c);
+    },
+    async listBackups() { return LS.get('zen:history', []).map(({ id, savedAt, by, json }) => ({ id, savedAt, by, size: json.length })); },
+    async restoreBackup(id) {
+      const b = LS.get('zen:history', []).find((x) => x.id === id);
+      if (!b) throw new Error('Backup not found.');
+      return this.saveContent(JSON.parse(b.json));
+    },
+    async resetToDefault() { await this.saveContent(clone(DEFAULT)); return clone(DEFAULT); },
+
+    async addEnquiry(e) {
+      const list = LS.get('zen:enquiries', []);
+      list.unshift({ ...e, id: uid(), status: 'new', created: nowISO() });
+      LS.set('zen:enquiries', list.slice(0, 500));
+      return { stored: true, delivered: false }; // not delivered to the team: caller opens the email app
+    },
+    async listEnquiries() { return LS.get('zen:enquiries', []); },
+    async updateEnquiry(id, patch) { LS.set('zen:enquiries', LS.get('zen:enquiries', []).map((q) => q.id === id ? { ...q, ...patch, updated: nowISO() } : q)); },
+    async deleteEnquiry(id) { LS.set('zen:enquiries', LS.get('zen:enquiries', []).filter((q) => q.id !== id)); },
+
+    async uploadImage(file) {
+      const { blob, type, w, h } = await resizeImage(file, 1600, 0.8);
+      const url = await blobToDataURL(blob);
+      const media = LS.get('zen:media', []);
+      const item = { id: uid(), name: safeName(file.name, type === 'image/png' ? 'png' : 'jpg'), url, w, h, size: blob.size, created: nowISO() };
+      media.unshift(item);
+      LS.set('zen:media', media);
+      return item.url;
+    },
+    async listMedia() { return LS.get('zen:media', []); },
+    async deleteMedia(item) { LS.set('zen:media', LS.get('zen:media', []).filter((m) => m.id !== item.id)); },
+
+    auth: {
+      needsLogin: false,
+      current: () => localUser,
+      async login() { localUser = { email: 'demo', uid: 'local' }; localAuthListeners.forEach((f) => f(localUser)); return localUser; },
+      async logout() { localUser = null; localAuthListeners.forEach((f) => f(null)); },
+      onChange(cb) { localAuthListeners.push(cb); cb(localUser); },
+      async changePassword() { throw new Error('Passwords are managed by Firebase — connect it first.'); },
+    },
+  };
+
+  /* =========================================================
+     FIREBASE ADAPTER (Firestore + Auth + Storage, compat SDK)
+     Data layout:
+       site/content              { json, updatedAt, updatedBy }
+       site/content/history/{id} { json, savedAt, by }
+       enquiries/{id}            { name, email, …, status, createdAt }
+       admins/{uid}              { email }   ← existence = admin rights
+       Storage: uploads/{file}
+     ========================================================= */
+  const loaded = {};
+  function loadScript(src) {
+    if (!loaded[src]) loaded[src] = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = res; s.onerror = () => rej(new Error('Could not load Firebase (' + src.split('/').pop() + '). Check the internet connection.'));
+      document.head.appendChild(s);
+    });
+    return loaded[src];
+  }
+  async function fb(parts) {
+    await loadScript(SDK + 'firebase-app-compat.js');
+    await Promise.all(parts.map((p) => loadScript(SDK + `firebase-${p}-compat.js`)));
+    if (!firebase.apps.length) firebase.initializeApp(cfg);
+    return firebase;
+  }
+  const db = async () => (await fb(['firestore'])).firestore();
+  const ts = (v) => (v && v.toDate ? v.toDate().toISOString() : v || '');
+
+  const remote = {
+    mode: 'firebase',
+    async getContent() {
+      try {
+        const snap = await (await db()).doc('site/content').get();
+        if (snap.exists && snap.data().json) return JSON.parse(snap.data().json);
+      } catch (e) { console.warn('[ZenStore] using default content:', e.message); }
+      return clone(DEFAULT);
+    },
+    async saveContent(c, by) {
+      const d = await db();
+      const ref = d.doc('site/content');
+      const prev = await ref.get();
+      const batch = d.batch();
+      if (prev.exists && prev.data().json) batch.set(ref.collection('history').doc(), { json: prev.data().json, savedAt: firebase.firestore.FieldValue.serverTimestamp(), by: prev.data().updatedBy || '' });
+      batch.set(ref, { json: JSON.stringify(c), updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: by || '' });
+      await batch.commit();
+      return clone(c);
+    },
+    async listBackups() {
+      const q = await (await db()).collection('site/content/history').orderBy('savedAt', 'desc').limit(40).get();
+      return q.docs.map((d) => ({ id: d.id, savedAt: ts(d.data().savedAt), by: d.data().by, size: (d.data().json || '').length }));
+    },
+    async restoreBackup(id) {
+      const snap = await (await db()).doc('site/content/history/' + id).get();
+      if (!snap.exists) throw new Error('Backup not found.');
+      return this.saveContent(JSON.parse(snap.data().json), 'restore');
+    },
+    async resetToDefault() { return this.saveContent(clone(DEFAULT), 'reset'); },
+
+    async addEnquiry(e) {
+      await (await db()).collection('enquiries').add({ ...e, status: 'new', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      return { stored: true, delivered: true };
+    },
+    async listEnquiries() {
+      const q = await (await db()).collection('enquiries').orderBy('createdAt', 'desc').limit(500).get();
+      return q.docs.map((d) => ({ ...d.data(), id: d.id, created: ts(d.data().createdAt) }));
+    },
+    async updateEnquiry(id, patch) { await (await db()).doc('enquiries/' + id).update(patch); },
+    async deleteEnquiry(id) { await (await db()).doc('enquiries/' + id).delete(); },
+
+    async uploadImage(file) {
+      const { blob, type } = await resizeImage(file, 2400, 0.85);
+      const f = await fb(['storage']);
+      const ref = f.storage().ref('uploads/' + safeName(file.name, type === 'image/png' ? 'png' : 'jpg'));
+      await ref.put(blob, { contentType: type, cacheControl: 'public,max-age=31536000' });
+      return ref.getDownloadURL();
+    },
+    async listMedia() {
+      const f = await fb(['storage']);
+      const res = await f.storage().ref('uploads').listAll();
+      const items = await Promise.all(res.items.map(async (r) => {
+        const [url, meta] = await Promise.all([r.getDownloadURL(), r.getMetadata()]);
+        return { id: r.fullPath, name: r.name, url, size: meta.size, created: meta.timeCreated };
+      }));
+      return items.sort((a, b) => String(b.created).localeCompare(String(a.created)));
+    },
+    async deleteMedia(item) { const f = await fb(['storage']); await f.storage().ref(item.id).delete(); },
+
+    auth: {
+      needsLogin: true,
+      current: () => (window.firebase && firebase.apps.length && firebase.auth ? firebase.auth().currentUser : null),
+      async login(email, password) {
+        const f = await fb(['auth', 'firestore']);
+        try {
+          const { user } = await f.auth().signInWithEmailAndPassword(email, password);
+          const adm = await f.firestore().doc('admins/' + user.uid).get();
+          if (!adm.exists) { await f.auth().signOut(); throw new Error('This account is not an admin. Ask the IT team to add it in Firebase (admins collection).'); }
+          return user;
+        } catch (e) {
+          if (/auth\/(invalid-credential|wrong-password|user-not-found|invalid-email)/.test(e.code || '')) throw new Error('Incorrect email or password.');
+          if (/too-many-requests/.test(e.code || '')) throw new Error('Too many attempts — please wait a few minutes.');
+          throw e;
+        }
+      },
+      async logout() { const f = await fb(['auth']); await f.auth().signOut(); },
+      async onChange(cb) {
+        const f = await fb(['auth', 'firestore']);
+        f.auth().onAuthStateChanged(async (u) => {
+          if (!u) return cb(null);
+          const adm = await f.firestore().doc('admins/' + u.uid).get().catch(() => null);
+          cb(adm && adm.exists ? u : null);
+        });
+      },
+      async changePassword(current, next) {
+        const f = await fb(['auth']);
+        const u = f.auth().currentUser;
+        const cred = firebase.auth.EmailAuthProvider.credential(u.email, current);
+        await u.reauthenticateWithCredential(cred).catch(() => { throw new Error('Current password is incorrect.'); });
+        await u.updatePassword(next);
+      },
+    },
+  };
+
+  window.ZenStore = MODE === 'firebase' ? remote : local;
+  window.ZenStore.defaults = () => clone(DEFAULT);
+})();
