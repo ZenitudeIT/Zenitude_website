@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenitude Concierge — Premier Concierge &amp; Butler Services · Mauritius</title>
+  <meta name="description" content="Zenitude Concierge crafts exceptional experiences in Mauritius, Rodrigues, Réunion and Madagascar — private butlers, yacht charters, bespoke itineraries, premium transfers and curated stays." />
+  <meta name="theme-color" content="#1b3519" />
+  <meta property="og:title" content="Zenitude Concierge — Premier Concierge & Butler Services" />
+  <meta property="og:description" content="Crafting exceptional experiences, one detail at a time." />
+  <meta property="og:image" content="assets/logo-green.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="apple-touch-icon" href="assets/favicon-180.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============ PRELOADER ============ -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <img src="assets/emblem-gold.png" alt="" class="preloader__emblem" />
+    <span class="preloader__line"><span></span></span>
+    <p class="preloader__text">Zenitude</p>
+  </div>
+
+  <!-- trailing ring that accompanies the emblem cursor (desktop only) -->
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header" id="header">
+    <div class="header__inner container">
+      <a href="#top" class="header__brand" aria-label="Zenitude Concierge — home">
+        <img src="assets/emblem-white.png" alt="" class="brand__emblem brand--light" />
+        <img src="assets/emblem-green.png" alt="" class="brand__emblem brand--dark" />
+        <img src="assets/wordmark-white.png" alt="Zenitude Concierge" class="brand__word brand--light" />
+        <img src="assets/wordmark-green.png" alt="" class="brand__word brand--dark" />
+      </a>
+
+      <nav class="nav" id="nav" aria-label="Main">
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#experiences">Experiences</a>
+        <a href="#stays">Stays</a>
+        <a href="#destinations">Destinations</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#b2b">B2B</a>
+        <a href="#contact" class="nav__cta">Enquire</a>
+      </nav>
+
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="hero__bg" aria-hidden="true">
+        <img src="assets/emblem-white.png" alt="" class="hero__watermark" />
+        <svg class="hero__waves" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path d="M0,192 C240,128 480,256 720,192 C960,128 1200,256 1440,192" />
+          <path d="M0,224 C240,160 480,288 720,224 C960,160 1200,288 1440,224" />
+          <path d="M0,256 C240,192 480,320 720,256 C960,192 1200,320 1440,256" />
+        </svg>
+      </div>
+
+      <div class="hero__content container">
+        <p class="eyebrow eyebrow--light reveal">Premier Concierge &amp; Butler Services · Mauritius</p>
+        <h1 class="hero__title">
+          <span class="line"><span>Crafting exceptional</span></span>
+          <span class="line"><span><em>experiences,</em> one detail</span></span>
+          <span class="line"><span>at a time.</span></span>
+        </h1>
+        <p class="hero__lead reveal">From private butlers to yacht charters across the Indian Ocean — every moment tailored with discretion, precision and absolute dependability.</p>
+        <div class="hero__actions reveal">
+          <a href="#contact" class="btn btn--gold">Plan your experience</a>
+          <a href="#services" class="btn btn--ghost">Discover our services</a>
+        </div>
+      </div>
+
+      <a href="#about" class="hero__scroll" aria-label="Scroll to content">
+        <span>Scroll</span><i></i>
+      </a>
+    </section>
+
+    <!-- ============ MARQUEE ============ -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>Mauritius</span><b>✦</b><span>Private Butlers</span><b>✦</b><span>Rodrigues</span><b>✦</b><span>Yacht Charters</span><b>✦</b><span>Réunion</span><b>✦</b><span>Luxury Transfers</span><b>✦</b><span>Madagascar</span><b>✦</b><span>Bespoke Itineraries</span><b>✦</b>
+        <span>Mauritius</span><b>✦</b><span>Private Butlers</span><b>✦</b><span>Rodrigues</span><b>✦</b><span>Yacht Charters</span><b>✦</b><span>Réunion</span><b>✦</b><span>Luxury Transfers</span><b>✦</b><span>Madagascar</span><b>✦</b><span>Bespoke Itineraries</span><b>✦</b>
+      </div>
+    </div>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="about section" id="about">
+      <div class="container about__grid">
+        <div class="about__media reveal">
+          <div class="frame">
+            <img src="https://zenitudeconcierge.com/wp-content/uploads/2026/08/Hotel-Rep-1024x682.png" alt="A Zenitude Concierge representative welcoming guests" loading="lazy" onerror="this.closest('.frame').classList.add('frame--fallback')" />
+            <img src="assets/emblem-white.png" alt="" class="frame__fallback-emblem" />
+          </div>
+          <div class="about__badge">
+            <img src="assets/emblem-gold.png" alt="" />
+            <span>Since day one,<br />at your service</span>
+          </div>
+        </div>
+
+        <div class="about__text">
+          <p class="eyebrow reveal">Our Commitment to Excellence</p>
+          <h2 class="section__title reveal">We believe in creating moments that <em>exceed expectations.</em></h2>
+          <p class="reveal">Each service is carefully curated around your individual preferences, with meticulous attention to every detail. Whether it is a seamless airport welcome, a private chef on a secluded beach, or a full itinerary across the islands, we take care of everything — so you can simply enjoy.</p>
+          <p class="reveal">Discretion, precision and absolute dependability form the foundation of every client relationship we build.</p>
+
+          <ul class="stats reveal">
+            <li><strong data-count="4">4</strong><span>Island<br />destinations</span></li>
+            <li><strong>24/7</strong><span>Tailored<br />assistance</span></li>
+            <li><strong data-count="3">3</strong><span>Realms —<br />air, land &amp; sea</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section class="services section section--cream" id="services">
+      <div class="container">
+        <div class="section__head">
+          <p class="eyebrow reveal">Signature Luxury Services</p>
+          <h2 class="section__title reveal">Elevating the <em>extraordinary</em></h2>
+          <p class="section__intro reveal">Highly tailored journeys, built around your preferences, schedules and passions.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card reveal">
+            <span class="card__num">I</span>
+            <svg class="card__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 46h36M18 46c0-8 6-15 14-15s14 7 14 15M32 31v-4M29 27h6M10 50h44"/></svg>
+            <h3>Personal Excellence</h3>
+            <p>Your own dedicated concierge and private butler — swift, attentive and always one step ahead.</p>
+            <ul>
+              <li>Dedicated concierge agents</li>
+              <li>Private butler service</li>
+              <li>Tailored assistance around the clock</li>
+            </ul>
+          </article>
+
+          <article class="card card--feature reveal">
+            <span class="card__num">II</span>
+            <svg class="card__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 10v30M32 12l14 24H32M32 18 22 36h10M12 42h40l-6 8H18zM8 54c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 8 2 4-2 8-2 4 2 8 2"/></svg>
+            <h3>Luxury Pursuits</h3>
+            <p>Days on the open ocean and moments well beyond the ordinary, arranged entirely around you.</p>
+            <ul>
+              <li>Private yacht charters</li>
+              <li>Premium fishing expeditions</li>
+              <li>Exclusive, one-of-a-kind experiences</li>
+            </ul>
+          </article>
+
+          <article class="card reveal">
+            <span class="card__num">III</span>
+            <svg class="card__icon" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="20"/><path d="m40 24-5 11-11 5 5-11zM32 8v4M32 52v4M8 32h4M52 32h4"/></svg>
+            <h3>Curated Adventures</h3>
+            <p>Thoughtfully designed journeys that reveal the authentic soul of each island.</p>
+            <ul>
+              <li>Bespoke itinerary design</li>
+              <li>Authentic cultural immersions</li>
+              <li>Access to exclusive destinations</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCES ============ -->
+    <section class="experiences section section--dark" id="experiences">
+      <div class="container">
+        <div class="section__head section__head--split">
+          <div>
+            <p class="eyebrow eyebrow--light reveal">Experiences</p>
+            <h2 class="section__title reveal">By air, by land, <em>by sea</em></h2>
+          </div>
+          <p class="section__intro reveal">Choose your element. We orchestrate the rest — the timing, the people, the small details that turn an outing into a memory.</p>
+        </div>
+
+        <div class="realms">
+          <article class="realm realm--air reveal" tabindex="0">
+            <div class="realm__bg"></div>
+            <span class="realm__idx">01</span>
+            <svg class="realm__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 36h34l10-8M20 36l-6 10M30 36v8M22 28h22a6 6 0 0 1 6 6M12 22h30M27 22v6"/></svg>
+            <div class="realm__body">
+              <h3>Air</h3>
+              <p>Helicopter tours and seaplane flights over turquoise lagoons, waterfalls and the iconic underwater-waterfall illusion of Le Morne.</p>
+              <a href="#contact" class="link">Arrange a flight</a>
+            </div>
+          </article>
+
+          <article class="realm realm--land reveal" tabindex="0">
+            <div class="realm__bg"></div>
+            <span class="realm__idx">02</span>
+            <svg class="realm__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 50 22 22l10 14 8-10 20 24zM18 28l4 4 4-4"/><circle cx="48" cy="14" r="5"/></svg>
+            <div class="realm__body">
+              <h3>Land</h3>
+              <p>Private guided excursions, nature reserves, tea routes, rum distilleries and cultural heritage — with your own friendly driver and guide.</p>
+              <a href="#contact" class="link">Plan an excursion</a>
+            </div>
+          </article>
+
+          <article class="realm realm--sea reveal" tabindex="0">
+            <div class="realm__bg"></div>
+            <span class="realm__idx">03</span>
+            <svg class="realm__icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M30 8v30M30 10l16 26H30M30 16 18 36h12M10 40h44l-6 8H16zM4 54c5 0 5-2 10-2s5 2 10 2 5-2 10-2 5 2 10 2 5-2 10-2 5 2 10 2"/></svg>
+            <div class="realm__body">
+              <h3>Sea</h3>
+              <p>Private catamaran and yacht charters, deep-sea fishing, dolphin encounters and secluded island picnics.</p>
+              <a href="#contact" class="link">Charter a yacht</a>
+            </div>
+          </article>
+        </div>
+
+        <!-- transfers -->
+        <div class="transfers">
+          <div class="transfer reveal">
+            <p class="eyebrow eyebrow--light">Transfers</p>
+            <h3>Premium</h3>
+            <p>Comfortable, punctual and courteous chauffeured transfers — airport welcomes, hotel connections and excursions across the island.</p>
+          </div>
+          <div class="transfer transfer--gold reveal">
+            <p class="eyebrow eyebrow--light">Transfers</p>
+            <h3>Luxury</h3>
+            <p>Arrive in absolute style: executive vehicles, meet-and-greet at arrival, and attentive assistance from the aircraft door to your villa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STAYS / ACCOMMODATION ============ -->
+    <section class="stays section" id="stays">
+      <div class="container">
+        <div class="section__head">
+          <p class="eyebrow reveal">Accommodation</p>
+          <h2 class="section__title reveal">Four coasts, <em>one compass</em></h2>
+          <p class="section__intro reveal">We help you select the perfect hotel or villa within your budget. Choose a coast of Mauritius to explore.</p>
+        </div>
+
+        <div class="compass reveal">
+          <div class="compass__wheel">
+            <img src="assets/emblem-green.png" alt="" class="compass__emblem" id="compassEmblem" />
+            <button class="compass__pt compass__pt--n is-active" data-region="north">North</button>
+            <button class="compass__pt compass__pt--e" data-region="east">East</button>
+            <button class="compass__pt compass__pt--s" data-region="south">South</button>
+            <button class="compass__pt compass__pt--w" data-region="west">West</button>
+          </div>
+
+          <div class="compass__panel" aria-live="polite">
+            <p class="compass__kicker" id="regionKicker">Grand Baie · Trou aux Biches · Pereybère</p>
+            <h3 class="compass__title" id="regionTitle">The North</h3>
+            <p class="compass__desc" id="regionDesc">Calm, sheltered lagoons and the island's liveliest coast — boutique shopping, fine dining and easy access to the northern islets.</p>
+            <a href="#contact" class="btn btn--green">Find my stay</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DESTINATIONS ============ -->
+    <section class="destinations section section--cream" id="destinations">
+      <div class="container">
+        <div class="section__head section__head--split">
+          <div>
+            <p class="eyebrow reveal">Destinations</p>
+            <h2 class="section__title reveal">Islands of the <em>Indian Ocean</em></h2>
+          </div>
+          <p class="section__intro reveal">Four extraordinary destinations, one trusted partner on the ground.</p>
+        </div>
+
+        <div class="dests">
+          <article class="dest dest--mu reveal">
+            <span class="dest__no">01</span>
+            <div class="dest__art"></div>
+            <div class="dest__body">
+              <h3>Mauritius</h3>
+              <p>Turquoise lagoons, world-class resorts and a rich blend of cultures — our home.</p>
+            </div>
+          </article>
+          <article class="dest dest--ro reveal">
+            <span class="dest__no">02</span>
+            <div class="dest__art"></div>
+            <div class="dest__body">
+              <h3>Rodrigues</h3>
+              <p>Authentic, unhurried and wonderfully preserved — the island time forgot.</p>
+            </div>
+          </article>
+          <article class="dest dest--re reveal">
+            <span class="dest__no">03</span>
+            <div class="dest__art"></div>
+            <div class="dest__body">
+              <h3>Réunion</h3>
+              <p>Dramatic volcanic peaks, lush cirques and some of the finest hiking on earth.</p>
+            </div>
+          </article>
+          <article class="dest dest--mg reveal">
+            <span class="dest__no">04</span>
+            <div class="dest__art"></div>
+            <div class="dest__body">
+              <h3>Madagascar</h3>
+              <p>Baobab avenues, unique wildlife and untouched beaches — a world of its own.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="testimonials section section--dark" id="testimonials">
+      <img src="assets/emblem-white.png" alt="" class="testimonials__mark" aria-hidden="true" />
+      <div class="container">
+        <p class="eyebrow eyebrow--light reveal center">Testimonials</p>
+        <h2 class="section__title reveal center">Kind words from <em>our guests</em></h2>
+
+        <div class="slider reveal" id="slider">
+          <div class="slider__track">
+            <figure class="quote is-active">
+              <div class="stars" aria-label="5 stars">★★★★★</div>
+              <blockquote>“Everything was so smooth with their support … A real 5* experience, i highly recommend them!”</blockquote>
+              <figcaption><strong>Tibor K.</strong><span>Hotel selection, airport welcome &amp; car rental</span></figcaption>
+            </figure>
+            <figure class="quote">
+              <div class="stars" aria-label="5 stars">★★★★★</div>
+              <blockquote>“The best time we had in Mauritius … Bruno, who orchestrated everything flawlessly.”</blockquote>
+              <figcaption><strong>Roy Barnatan</strong><span>Four-day private journey</span></figcaption>
+            </figure>
+            <figure class="quote">
+              <div class="stars" aria-label="5 stars">★★★★★</div>
+              <blockquote>“The excursions were very nice … We had a wonderful vacation in Mauritius.”</blockquote>
+              <figcaption><strong>Birgit S.</strong><span>Four guided excursions</span></figcaption>
+            </figure>
+          </div>
+          <div class="slider__nav">
+            <button class="slider__arrow" data-dir="-1" aria-label="Previous testimonial">←</button>
+            <div class="slider__dots" role="tablist"></div>
+            <button class="slider__arrow" data-dir="1" aria-label="Next testimonial">→</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TEAM ============ -->
+    <section class="team section" id="team">
+      <div class="container team__grid">
+        <div class="team__text">
+          <p class="eyebrow reveal">The Team</p>
+          <h2 class="section__title reveal">The people behind <em>every detail</em></h2>
+          <p class="reveal">Service tailored to each client's needs is only possible with a team that truly cares. Our professionals work quietly behind the scenes so that every interaction feels seamless and memorable.</p>
+          <a href="#contact" class="btn btn--green reveal">Meet the team</a>
+        </div>
+        <div class="team__media reveal">
+          <div class="frame frame--wide">
+            <img src="https://zenitudeconcierge.com/wp-content/uploads/2026/08/the-team-e1786623455626.png" alt="The Zenitude Concierge team" loading="lazy" onerror="this.closest('.frame').classList.add('frame--fallback')" />
+            <img src="assets/emblem-white.png" alt="" class="frame__fallback-emblem" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ B2B ============ -->
+    <section class="b2b" id="b2b">
+      <div class="container b2b__inner">
+        <div class="b2b__text">
+          <p class="eyebrow eyebrow--light reveal">For Travel Professionals</p>
+          <h2 class="section__title reveal">B2B Booking <em>Portal</em></h2>
+          <p class="reveal">Built for agencies and tour operators who value efficiency, flexibility and fast access to destination services.</p>
+          <ul class="b2b__list reveal">
+            <li><span>01</span>Live availability &amp; competitive rates</li>
+            <li><span>02</span>Tailor-made travel solutions</li>
+            <li><span>03</span>Instant confirmations</li>
+          </ul>
+          <a href="mailto:sales@zenitudeconcierge.com?subject=B2B%20Portal%20Access" class="btn btn--gold reveal">Request portal access</a>
+        </div>
+        <div class="b2b__art reveal" aria-hidden="true">
+          <img src="https://zenitudeconcierge.com/wp-content/uploads/2026/08/New-Flute-e1786538997167.png" alt="" class="b2b__flute" loading="lazy" onerror="this.style.display='none'" />
+          <img src="assets/emblem-gold.png" alt="" class="b2b__emblem" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="contact section" id="contact">
+      <div class="container contact__grid">
+        <div class="contact__info">
+          <p class="eyebrow reveal">Contact</p>
+          <h2 class="section__title reveal">Let us craft <em>your experience</em></h2>
+          <p class="reveal">Tell us what you have in mind — we'll respond with a tailored proposal.</p>
+
+          <dl class="details reveal">
+            <div><dt>Telephone</dt><dd><a href="tel:+2306509520">+230 650 9520</a></dd></div>
+            <div><dt>Email</dt><dd><a href="mailto:info@zenitudeconcierge.com">info@zenitudeconcierge.com</a></dd></div>
+            <div><dt>Office</dt><dd>Suite 101, First Floor, The Cubicle,<br />Royal Road, Phoenix, Mauritius</dd></div>
+            <div><dt>Hours</dt><dd>Mon – Fri · 8:30 – 17:00<br />Sat &amp; public holidays · 8:30 – 16:30</dd></div>
+          </dl>
+        </div>
+
+        <form class="form reveal" id="contactForm" novalidate>
+          <div class="form__row">
+            <label class="field"><input type="text" name="name" placeholder=" " required /><span>Full name</span></label>
+            <label class="field"><input type="email" name="email" placeholder=" " required /><span>Email address</span></label>
+          </div>
+          <div class="form__row">
+            <label class="field"><input type="tel" name="phone" placeholder=" " /><span>Phone (optional)</span></label>
+            <label class="field field--select">
+              <select name="interest" required>
+                <option value="" disabled selected hidden></option>
+                <option>Private Butler / Concierge</option>
+                <option>Yacht Charter &amp; Fishing</option>
+                <option>Excursions &amp; Itineraries</option>
+                <option>Transfers</option>
+                <option>Accommodation</option>
+                <option>B2B Partnership</option>
+              </select>
+              <span>I'm interested in</span>
+            </label>
+          </div>
+          <div class="form__row">
+            <label class="field"><input type="date" name="date" placeholder=" " /><span>Arrival date</span></label>
+            <label class="field"><input type="number" name="guests" min="1" placeholder=" " /><span>Guests</span></label>
+          </div>
+          <label class="field"><textarea name="message" rows="4" placeholder=" " required></textarea><span>Tell us about your plans</span></label>
+          <button type="submit" class="btn btn--green btn--full">Send enquiry</button>
+          <p class="form__note" id="formNote" role="status"></p>
+        </form>
+      </div>
+
+      <div class="map container reveal">
+        <iframe title="Zenitude Concierge office location" src="https://maps.google.com/maps?q=The%20Cubicle%2C%20Royal%20Road%2C%20Phoenix%2C%20Mauritius&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <img src="assets/logo-white.png" alt="Zenitude Concierge — Premier Concierge & Butler Services" class="footer__logo" />
+        <div class="footer__cols">
+          <div>
+            <h4>Explore</h4>
+            <a href="#about">About us</a>
+            <a href="#services">Services</a>
+            <a href="#experiences">Experiences</a>
+            <a href="#stays">Accommodation</a>
+          </div>
+          <div>
+            <h4>Destinations</h4>
+            <a href="#destinations">Mauritius</a>
+            <a href="#destinations">Rodrigues</a>
+            <a href="#destinations">Réunion</a>
+            <a href="#destinations">Madagascar</a>
+          </div>
+          <div>
+            <h4>Follow</h4>
+            <a href="https://www.facebook.com/profile.php?id=61572717015871" target="_blank" rel="noopener">Facebook</a>
+            <a href="https://www.instagram.com/zenitude_concierge/" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.linkedin.com/company/zenitude-premier-concierge-butler-services/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© <span id="year">2026</span> Zenitude Concierge. All rights reserved.</p>
+        <p><a href="/privacy-policy/">Privacy Policy</a> · <a href="/terms/">Terms</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#top" class="to-top" id="toTop" aria-label="Back to top"><img src="assets/emblem-white.png" alt="" /></a>
+
+  <script src="script.js"></script>
+</body>
+</html>
