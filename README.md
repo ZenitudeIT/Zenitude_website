@@ -15,6 +15,7 @@ It is a static site built with plain **HTML, CSS and JavaScript**: no PHP, no bu
 | `team.html` | The team. The first visible member is featured; hover over the others to read their bios. |
 | `destination.html?slug=mauritius` | One page per destination (`mauritius`, `rodrigues`, `reunion`, `madagascar`) |
 | `experience.html?slug=air` | One page per experience (`air`, `land`, `sea`) |
+| `stays.html?region=west` | Hotels & villas for one coast (`north`, `east`, `south`, `west`). The home page compass → **Find my stay** opens the selected coast |
 | `privacy.html`, `terms.html` | Legal pages (editable in the admin) |
 | `404.html` | Not-found page |
 | `admin/` | Admin panel |

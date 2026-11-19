@@ -41,6 +41,13 @@ window.ZenSite = { init() {
     if (target) setTimeout(() => target.scrollIntoView({ behavior: 'instant', block: 'start' }), 60);
   }
 
+  /* ---------- stays: keep the selected coast tab visible on small screens ---------- */
+  const activeTab = $('.coast-tab.is-active');
+  if (activeTab) {
+    const bar = activeTab.parentElement;
+    bar.scrollLeft = activeTab.offsetLeft - (bar.clientWidth - activeTab.offsetWidth) / 2;
+  }
+
   /* ---------- header + back-to-top ---------- */
   const header = $('#header');
   const toTop = $('#toTop');
@@ -169,6 +176,8 @@ window.ZenSite = { init() {
           $('#regionTitle').textContent = btn.dataset.title;
           $('#regionKicker').textContent = btn.dataset.kicker;
           $('#regionDesc').textContent = btn.dataset.desc;
+          const stayLink = $('#stayLink');
+          if (stayLink && btn.dataset.key) stayLink.href = 'stays.html?region=' + encodeURIComponent(btn.dataset.key);
           panel.classList.remove('is-swapping');
         }, 380);
       });
@@ -219,11 +228,15 @@ window.ZenSite = { init() {
     const openedAt = Date.now();
 
     // pre-fill from ?enquire=Madagascar (links on destination / experience pages)
-    const wanted = new URLSearchParams(location.search).get('enquire');
+    const params = new URLSearchParams(location.search);
+    const wanted = params.get('enquire');
+    const stay = params.get('stay');
     if (wanted) {
       const opt = [...select.options].find((o) => o.value.toLowerCase() === wanted.toLowerCase());
       if (opt) select.value = opt.value;
-      if (!message.value) message.value = `I would like to know more about ${wanted}.`;
+      if (!message.value) message.value = stay
+        ? `I am interested in staying at ${stay}${params.get('region') ? ' (' + params.get('region') + ')' : ''}. Could you send me availability and rates for my dates?`
+        : `I would like to know more about ${wanted}.`;
     }
 
     const mailtoFallback = (d) => {

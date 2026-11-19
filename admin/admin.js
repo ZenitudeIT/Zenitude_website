@@ -147,6 +147,19 @@
       item: { quote: '', author: '', context: '', rating: 5, published: false }, labelKey: 'author', subKey: 'quote', itemName: 'testimonial',
       fields: [T('author', 'Guest name'), T('context', 'Context (e.g. "Four-day private journey")'), SEL('rating', 'Stars', [[5, '★★★★★'], [4, '★★★★'], [3, '★★★']], { number: true }), TOG('published', 'Visible on website'), TA('quote', 'Quote', { rows: 4, hint: 'Without quotation marks — they are added automatically.' })],
     },
+    stays: {
+      title: 'Hotels & villas', icon: '⌂', kind: 'list', desc: 'Shown on the Stays pages — one list per coast. Choose the coast for each address.',
+      item: { name: 'New hotel', region: 'north', area: '', type: 'Resort', budget: '', description: '', image: '', website: '', published: false }, labelKey: 'name', thumbKey: 'image', subKey: 'region', itemName: 'hotel or villa',
+      fields: [T('name', 'Name'),
+        SEL('region', 'Coast', [['north', 'North'], ['east', 'East'], ['south', 'South'], ['west', 'West']]),
+        T('area', 'Area / village', { hint: 'e.g. Grand Baie, Belle Mare, Le Morne' }),
+        SEL('type', 'Type', [['Resort', 'Resort'], ['Hotel', 'Hotel'], ['Boutique hotel', 'Boutique hotel'], ['Villas', 'Villas'], ['Private villa', 'Private villa'], ['Guesthouse', 'Guesthouse']]),
+        SEL('budget', 'Budget level (optional)', [['', '— not shown —'], ['Comfort', 'Comfort'], ['Premium', 'Premium'], ['Luxury', 'Luxury'], ['Ultra-luxury', 'Ultra-luxury']]),
+        TOG('published', 'Visible on website'),
+        TA('description', 'Short description', { rows: 3 }),
+        IMG('image', 'Photo', { hint: 'Use photos you have permission to use (e.g. from the hotel’s press kit).' }),
+        T('website', 'Hotel website (optional)', { hint: 'Full address starting with https://' })],
+    },
     services: {
       title: 'Services', icon: '✦', kind: 'list', desc: 'The signature service cards on the home page.',
       item: { title: 'New service', text: '', items: [] }, labelKey: 'title', itemName: 'service',
@@ -181,7 +194,7 @@
 
   const NAV = [
     ['Overview', [['dashboard', 'Dashboard', '◇'], ['enquiries', 'Enquiries', '✉']]],
-    ['Website', ['home', 'destinations', 'experiences', 'team', 'testimonials', 'services', 'regions', 'transfers', 'pages', 'settings'].map((k) => [k, SECTIONS[k].title, SECTIONS[k].icon])],
+    ['Website', ['home', 'destinations', 'experiences', 'stays', 'team', 'testimonials', 'services', 'regions', 'transfers', 'pages', 'settings'].map((k) => [k, SECTIONS[k].title, SECTIONS[k].icon])],
     ['Library', [['media', 'Media', '▣']]],
     ['System', [['backups', 'Backups & export', '↺'], ['account', 'Account', '⚿']]],
   ];
@@ -286,6 +299,7 @@
               cfg.thumbKey ? h('span', { class: 'item__thumb' }, item[cfg.thumbKey] ? h('img', { src: imgSrc(item[cfg.thumbKey]), alt: '', onerror: (e) => e.target.remove() }) : null) : h('span', { class: 'item__num', text: String(i + 1).padStart(2, '0') }),
               h('div', { class: 'item__text' }, title, sub),
               item.published === false ? h('span', { class: 'chip chip--muted', text: 'Hidden' }) : null,
+              cfg === SECTIONS.stays && item.region ? h('a', { class: 'icon-btn', href: `../stays.html?region=${encodeURIComponent(item.region)}`, target: '_blank', title: 'View coast page (saved version)' }, '↗') : null,
               cfg.page && item.slug ? h('a', { class: 'icon-btn', href: `../${cfg.page}.html?slug=${encodeURIComponent(item.slug)}`, target: '_blank', title: 'View page (saved version)' }, '↗') : null,
               h('button', { class: 'icon-btn', type: 'button', title: 'Move up', disabled: i === 0, onclick: () => { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; markDirty(); draw(); } }, '↑'),
               h('button', { class: 'icon-btn', type: 'button', title: 'Move down', disabled: i === arr.length - 1, onclick: () => { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; markDirty(); draw(); } }, '↓'),

@@ -30,6 +30,10 @@
   const destUrl = (slug) => 'destination.html?slug=' + encodeURIComponent(slug);
   const expUrl = (slug) => 'experience.html?slug=' + encodeURIComponent(slug);
   const enquireUrl = (topic) => 'index.html?enquire=' + encodeURIComponent(topic) + '#contact';
+  const staysUrl = (key) => 'stays.html?region=' + encodeURIComponent(key);
+  const stayEnquireUrl = (stay, region) => 'index.html?enquire=Accommodation&stay=' + encodeURIComponent(stay) + (region ? '&region=' + encodeURIComponent(region) : '') + '#contact';
+  const REGION_ORDER = ['north', 'east', 'south', 'west'];
+  const cap = (k) => String(k || '').charAt(0).toUpperCase() + String(k || '').slice(1);
 
   const ICONS = {
     air: '<path d="M8 36h34l10-8M20 36l-6 10M30 36v8M22 28h22a6 6 0 0 1 6 6M12 22h30M27 22v6"/>',
@@ -65,6 +69,10 @@
           <a href="${home('destinations')}" class="nav__parent">Destinations</a>
           <div class="nav__drop">${drop(pub(c.destinations), destUrl)}</div>
         </div>
+        <div class="nav__group${active === 'stays' ? ' is-active' : ''}">
+          <a href="${staysUrl((c.regions && c.regions[0] && c.regions[0].key) || 'north')}" class="nav__parent">Stays</a>
+          <div class="nav__drop">${(c.regions || []).filter((r) => REGION_ORDER.includes(r.key)).map((r) => `<a href="${esc(staysUrl(r.key))}">${esc(r.title || cap(r.key))}</a>`).join('')}</div>
+        </div>
         <a href="team.html"${active === 'team' ? ' class="is-current"' : ''}>Team</a>
         <a href="${home('b2b')}">B2B</a>
         <a href="${home('contact')}" class="nav__cta">Enquire</a>
@@ -88,7 +96,7 @@
         </div>
         <div class="footer__cols">
           <div><h4>Explore</h4>
-            <a href="${home('about')}">About us</a><a href="team.html">Our team</a><a href="${home('services')}">Services</a><a href="${home('stays')}">Accommodation</a>
+            <a href="${home('about')}">About us</a><a href="team.html">Our team</a><a href="${home('services')}">Services</a><a href="${staysUrl('north')}">Hotels &amp; villas</a>
             ${pub(c.experiences).map((x) => `<a href="${esc(expUrl(x.slug))}">${esc(x.name)} experiences</a>`).join('')}
           </div>
           <div><h4>Destinations</h4>${pub(c.destinations).map((d) => `<a href="${esc(destUrl(d.slug))}">${esc(d.name)}</a>`).join('')}</div>
@@ -255,13 +263,13 @@
         <div class="compass reveal">
           <div class="compass__wheel">
             <img src="${A}emblem-green.png" alt="" class="compass__emblem" id="compassEmblem" />
-            ${regions.filter((r) => pos[r.key]).map((r, i) => `<button class="compass__pt compass__pt--${pos[r.key]}${i === 0 ? ' is-active' : ''}" data-title="${esc(r.title)}" data-kicker="${esc(r.kicker)}" data-desc="${esc(r.desc)}" data-rot="${rot[r.key]}">${esc(r.key[0].toUpperCase() + r.key.slice(1))}</button>`).join('')}
+            ${regions.filter((r) => pos[r.key]).map((r, i) => `<button class="compass__pt compass__pt--${pos[r.key]}${i === 0 ? ' is-active' : ''}" data-key="${esc(r.key)}" data-title="${esc(r.title)}" data-kicker="${esc(r.kicker)}" data-desc="${esc(r.desc)}" data-rot="${rot[r.key]}">${esc(r.key[0].toUpperCase() + r.key.slice(1))}</button>`).join('')}
           </div>
           <div class="compass__panel" aria-live="polite">
             <p class="compass__kicker" id="regionKicker">${esc(r0.kicker)}</p>
             <h3 class="compass__title" id="regionTitle">${esc(r0.title)}</h3>
             <p class="compass__desc" id="regionDesc">${esc(r0.desc)}</p>
-            <a href="${esc(enquireUrl('Accommodation'))}" class="btn btn--green">Find my stay</a>
+            <a href="${esc(staysUrl(r0.key || 'north'))}" class="btn btn--green" id="stayLink">Find my stay</a>
           </div>
         </div>
       </div>
@@ -464,6 +472,75 @@
     <div class="lightbox" id="lightbox" hidden><button class="lightbox__close" aria-label="Close">×</button><img alt="" /></div>`;
   }
 
+  /* ---------- STAYS (hotels & villas per coast) ---------- */
+  function pageStays(c) {
+    const regions = (c.regions || []).filter((r) => REGION_ORDER.includes(r.key))
+      .sort((a, b) => REGION_ORDER.indexOf(a.key) - REGION_ORDER.indexOf(b.key));
+    if (!regions.length) return null;
+    const want = (new URLSearchParams(location.search).get('region') || '').toLowerCase();
+    const r = regions.find((x) => x.key === want) || regions[0];
+    const stays = pub(c.stays).filter((s) => s.region === r.key);
+    document.title = `Hotels & villas — ${r.title || cap(r.key)} of Mauritius — ` + (c.settings.siteName || 'Zenitude Concierge');
+    const meta = document.querySelector('meta[name="description"]'); if (meta) meta.content = r.desc || '';
+    return `
+    <section class="page-hero page-hero--stay page-hero--stay-${esc(r.key)}">
+      <img src="${A}emblem-white.png" alt="" class="hero__watermark" aria-hidden="true" />
+      <div class="container page-hero__content">
+        <nav class="crumbs reveal" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="${home('stays')}">Accommodation</a><span>/</span>${esc(r.title || cap(r.key))}</nav>
+        <p class="eyebrow eyebrow--light reveal">${esc(r.kicker)}</p>
+        <h1 class="page-hero__title reveal">Stays in <em>${esc(String(r.title || cap(r.key)).replace(/^the\s+/i, 'the '))}</em></h1>
+        <p class="page-hero__lead reveal">${esc(r.desc)}</p>
+      </div>
+    </section>
+
+    <div class="coast-tabs" role="tablist" aria-label="Choose a coast">
+      <div class="container coast-tabs__inner">
+        <span class="coast-tabs__label">Choose a coast</span>
+        ${regions.map((x) => `<a role="tab" aria-selected="${x.key === r.key}" class="coast-tab${x.key === r.key ? ' is-active' : ''}" href="${esc(staysUrl(x.key))}"><span class="coast-tab__dir">${esc(cap(x.key)[0])}</span>${esc(x.title || cap(x.key))}</a>`).join('')}
+      </div>
+    </div>
+
+    <section class="section stays-list">
+      <div class="container">
+        <div class="section__head section__head--split">
+          <div>
+            <p class="eyebrow reveal">${stays.length} hand-picked ${stays.length === 1 ? 'address' : 'addresses'}</p>
+            <h2 class="section__title reveal">Where to stay in <em>${esc(String(r.title || cap(r.key)).replace(/^the\s+/i, 'the '))}</em></h2>
+          </div>
+          <p class="section__intro reveal">We help you choose the right hotel or villa for your budget and style of travel, then handle the booking, transfers and every request during your stay.</p>
+        </div>
+        ${stays.length ? `<div class="stays">${stays.map((s, i) => {
+          const pic = img(s.image);
+          const site = safeUrl(s.website);
+          return `
+          <article class="stay reveal">
+            <div class="stay__media stay__media--${esc(r.key)}${pic ? '' : ' frame--fallback'}">
+              ${pic ? `<img src="${esc(pic)}" alt="${esc(s.name)}" loading="lazy" data-fallback />` : '<img alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />'}
+              <img src="${A}emblem-white.png" alt="" class="frame__fallback-emblem" />
+              <span class="stay__no">${pad(i + 1)}</span>
+            </div>
+            <div class="stay__body">
+              <p class="stay__meta">${[s.area, s.type].filter(Boolean).map(esc).join(' · ')}</p>
+              <h3>${esc(s.name)}</h3>
+              <p class="stay__desc">${esc(s.description)}</p>
+              ${s.budget ? `<p class="stay__budget"><span>Budget</span>${esc(s.budget)}</p>` : ''}
+              <div class="stay__actions">
+                <a class="btn btn--green" href="${esc(stayEnquireUrl(s.name, r.title || cap(r.key)))}">Enquire about this stay</a>
+                ${site ? `<a class="stay__site" href="${esc(site)}" target="_blank" rel="noopener">Hotel website ↗</a>` : ''}
+              </div>
+            </div>
+          </article>`; }).join('')}</div>`
+        : `<div class="stays-empty reveal"><img src="${A}emblem-gold.png" alt="" /><p>We are curating our selection for this coast. Tell us what you are looking for and we will send you tailored suggestions.</p><a class="btn btn--green" href="${esc(enquireUrl('Accommodation'))}">Ask our team</a></div>`}
+      </div>
+    </section>
+
+    <section class="cta-band"><div class="container cta-band__inner">
+      <div><p class="eyebrow eyebrow--light reveal">Not sure where to stay?</p>
+      <h2 class="section__title reveal">Tell us your budget — we'll find <em>the perfect match</em></h2></div>
+      <a href="${esc(enquireUrl('Accommodation'))}" class="btn btn--gold reveal">Get tailored suggestions</a>
+    </div></section>`;
+  }
+
   /* ---------- 404 ---------- */
   function pageNotFound() {
     document.title = 'Page not found — Zenitude Concierge';
@@ -505,6 +582,7 @@
     let html =
       PAGE === 'home' ? pageHome(c) :
       PAGE === 'team' ? pageTeam(c) :
+      PAGE === 'stays' ? pageStays(c) :
       kind ? pageDetail(c, kind) :
       PAGE === 'privacy' || PAGE === 'terms' ? pageText(c) : null;
     if (html == null) html = pageNotFound();

@@ -506,5 +506,183 @@ window.ZEN_DEFAULT_CONTENT = {
       "title": "Terms & Conditions",
       "body": "This page will set out the terms that apply to bookings and services arranged by Zenitude Concierge.\n\nThe final text should be reviewed by management or a legal adviser before publication. For any question in the meantime, please contact info@zenitudeconcierge.com."
     }
-  }
+  },
+  "stays": [
+    {
+      "region": "north",
+      "name": "LUX* Grand Baie",
+      "area": "Grand Baie",
+      "type": "Resort",
+      "budget": "",
+      "description": "Contemporary beachfront resort in the heart of Grand Baie, a short stroll from the north's liveliest restaurants and boutiques.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "north",
+      "name": "Royal Palm Beachcomber Luxury",
+      "area": "Grand Baie",
+      "type": "Resort",
+      "budget": "",
+      "description": "A long-established address on the bay of Grand Baie, known for discreet and highly personalised service.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "north",
+      "name": "Trou aux Biches Beachcomber",
+      "area": "Trou aux Biches",
+      "type": "Resort",
+      "budget": "",
+      "description": "Suites and villas with private pools set along one of the most beautiful beaches of the north-west.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "north",
+      "name": "The Oberoi Beach Resort, Mauritius",
+      "area": "Turtle Bay, Pointe aux Piments",
+      "type": "Resort",
+      "budget": "",
+      "description": "Villas and pavilions in tropical gardens overlooking the calm waters of Turtle Bay.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "east",
+      "name": "One&Only Le Saint Géran",
+      "area": "Belle Mare",
+      "type": "Resort",
+      "budget": "",
+      "description": "A legendary resort on its own peninsula, between a turquoise lagoon and the open ocean.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "east",
+      "name": "Constance Prince Maurice",
+      "area": "Poste de Flacq",
+      "type": "Resort",
+      "budget": "",
+      "description": "A secluded hideaway with suites on stilts above a natural fish reserve.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "east",
+      "name": "Shangri-La Le Touessrok",
+      "area": "Trou d'Eau Douce",
+      "type": "Resort",
+      "budget": "",
+      "description": "Facing Île aux Cerfs, with its own private island, Îlot Mangénie, just across the lagoon.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "east",
+      "name": "Four Seasons Resort Mauritius at Anahita",
+      "area": "Beau Champ",
+      "type": "Villas",
+      "budget": "",
+      "description": "Villas with private pools on a lagoon-front estate, with a championship golf course on site.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "south",
+      "name": "Heritage Le Telfair",
+      "area": "Bel Ombre",
+      "type": "Resort",
+      "budget": "",
+      "description": "Colonial-style elegance within the Heritage Bel Ombre nature and golf estate.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "south",
+      "name": "SO/ Sofitel Mauritius",
+      "area": "Bel Ombre",
+      "type": "Resort",
+      "budget": "",
+      "description": "A design-led resort on the wild south coast, with sweeping ocean views.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "south",
+      "name": "Outrigger Mauritius Beach Resort",
+      "area": "Bel Ombre",
+      "type": "Resort",
+      "budget": "",
+      "description": "A relaxed beachfront resort, popular with families, against the green hills of the south.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "south",
+      "name": "Shanti Maurice",
+      "area": "Saint Félix",
+      "type": "Resort",
+      "budget": "",
+      "description": "A wellness-focused retreat set in lush gardens along an unspoilt stretch of the south coast.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "west",
+      "name": "Paradis Beachcomber",
+      "area": "Le Morne",
+      "type": "Resort",
+      "budget": "",
+      "description": "At the foot of Le Morne Brabant, with a long sandy beach and a golf course on the peninsula.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "west",
+      "name": "Dinarobin Beachcomber",
+      "area": "Le Morne",
+      "type": "Resort",
+      "budget": "",
+      "description": "An all-suite resort on the Le Morne peninsula, calm and spacious.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "west",
+      "name": "Sugar Beach",
+      "area": "Flic en Flac",
+      "type": "Resort",
+      "budget": "",
+      "description": "A plantation-style resort on a broad beach made for the west coast's famous sunsets.",
+      "image": "",
+      "website": "",
+      "published": true
+    },
+    {
+      "region": "west",
+      "name": "La Pirogue",
+      "area": "Flic en Flac",
+      "type": "Resort",
+      "budget": "",
+      "description": "Thatched bungalows inspired by traditional fishing boats, set beneath palm trees by the sea.",
+      "image": "",
+      "website": "",
+      "published": true
+    }
+  ]
 };

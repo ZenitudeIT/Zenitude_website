@@ -16,6 +16,12 @@
   const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 
   const clone = (o) => JSON.parse(JSON.stringify(o));
+  // Content saved before a new section existed (e.g. "stays") gets that section from the defaults.
+  const withDefaults = (c) => {
+    const out = c && typeof c === 'object' ? c : {};
+    for (const k of Object.keys(DEFAULT)) if (!(k in out)) out[k] = clone(DEFAULT[k]);
+    return out;
+  };
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const nowISO = () => new Date().toISOString();
 
@@ -58,7 +64,7 @@
 
   const local = {
     mode: 'local',
-    async getContent() { return clone(LS.get('zen:content', null) || DEFAULT); },
+    async getContent() { return withDefaults(clone(LS.get('zen:content', null) || DEFAULT)); },
     async saveContent(c, by) {
       const prev = LS.get('zen:content', null) || DEFAULT;
       {
@@ -141,7 +147,7 @@
     async getContent() {
       try {
         const snap = await (await db()).doc('site/content').get();
-        if (snap.exists && snap.data().json) return JSON.parse(snap.data().json);
+        if (snap.exists && snap.data().json) return withDefaults(JSON.parse(snap.data().json));
       } catch (e) { console.warn('[ZenStore] using default content:', e.message); }
       return clone(DEFAULT);
     },
