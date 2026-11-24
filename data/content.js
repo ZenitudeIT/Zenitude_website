@@ -684,5 +684,38 @@ window.ZEN_DEFAULT_CONTENT = {
       "website": "",
       "published": true
     }
-  ]
+  ],
+  "teamWider": {
+    "show": true,
+    "eyebrow": "The wider team",
+    "title": "Many hands, *one standard*",
+    "intro": "Behind every arrival, every excursion and every quiet request is a team that knows Mauritius by heart. Each person brings their own expertise, and all of them share one goal: that you never have to think about the details.",
+    "roles": [
+      {
+        "title": "Concierge agents",
+        "text": "Your first point of contact, before and during your stay, for every booking, change and special request."
+      },
+      {
+        "title": "Private butlers",
+        "text": "Discreet, attentive service in your villa or suite, anticipating needs before they are expressed."
+      },
+      {
+        "title": "Drivers & guides",
+        "text": "Friendly local experts who know every road, viewpoint and hidden table on the island."
+      },
+      {
+        "title": "Operations & planning",
+        "text": "The people who build each itinerary and make sure every transfer, reservation and timing runs smoothly."
+      },
+      {
+        "title": "Sales & partnerships",
+        "text": "Working with hotels, travel agents and tour operators worldwide to secure the best options for our guests."
+      },
+      {
+        "title": "Administration & technology",
+        "text": "Keeping the business running behind the scenes, from people and finance to the systems that power our service."
+      }
+    ],
+    "buttonLabel": "Work with our team"
+  }
 };

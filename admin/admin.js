@@ -158,6 +158,13 @@
       item: { name: 'New team member', role: '', published: false, photo: '', bio: '' }, labelKey: 'name', thumbKey: 'photo', subKey: 'role', itemName: 'team member',
       fields: [T('name', 'Full name'), T('role', 'Job title'), TOG('published', 'Visible on website'), IMG('photo', 'Photo', { hint: 'Portrait photos work best; the face should be near the top.' }), TA('bio', 'Biography', { rows: 4 })],
     },
+    teamWider: {
+      title: 'Wider team', icon: '☷', kind: 'object', desc: 'The text-only section under the team photos on the Team page — roles, no names or pictures.',
+      groups: [
+        ['Section', [TOG('show', 'Show this section on the Team page'), T('eyebrow', 'Small heading'), T('title', 'Title', { hint: ITALIC }), TA('intro', 'Introduction', { rows: 4 }), T('buttonLabel', 'Button text (leave empty to hide the button)')]],
+        ['Roles', [LIST('roles', 'Role tiles', [T('title', 'Role'), TA('text', 'Short description', { rows: 2 })], { title: 'New role', text: '' }, { labelKey: 'title', subKey: 'text', itemName: 'role' })]],
+      ],
+    },
     testimonials: {
       title: 'Testimonials', icon: '❝', kind: 'list', desc: 'Guest reviews shown in the slider.',
       item: { quote: '', author: '', context: '', rating: 5, published: false }, labelKey: 'author', subKey: 'quote', itemName: 'testimonial',
@@ -210,7 +217,7 @@
 
   const NAV = [
     ['Overview', [['dashboard', 'Dashboard', '◇'], ['enquiries', 'Enquiries', '✉']]],
-    ['Website', ['home', 'destinations', 'experiences', 'stays', 'team', 'testimonials', 'services', 'regions', 'transfers', 'pages', 'settings'].map((k) => [k, SECTIONS[k].title, SECTIONS[k].icon])],
+    ['Website', ['home', 'destinations', 'experiences', 'stays', 'team', 'teamWider', 'testimonials', 'services', 'regions', 'transfers', 'pages', 'settings'].map((k) => [k, SECTIONS[k].title, SECTIONS[k].icon])],
     ['Library', [['media', 'Media', '▣']]],
     ['System', [['backups', 'Backups & export', '↺'], ['account', 'Account', '⚿']]],
   ];

@@ -377,6 +377,7 @@
   function pageTeam(c) {
     const H = c.home || {};
     const team = pub(c.team);
+    const W = c.teamWider;
     document.title = 'Our Team — ' + (c.settings.siteName || 'Zenitude Concierge');
     return `
     <section class="page-hero page-hero--plain">
@@ -403,10 +404,27 @@
         </div>
       </div>
     </section>
+    ${W && W.show !== false ? `
+    <section class="section section--dark wider-team">
+      <img src="${A}emblem-white.png" alt="" class="wider-team__mark" aria-hidden="true" />
+      <div class="container">
+        <div class="section__head section__head--split">
+          <div>
+            <p class="eyebrow eyebrow--light reveal">${esc(W.eyebrow)}</p>
+            <h2 class="section__title reveal">${rich(W.title)}</h2>
+          </div>
+          <p class="section__intro reveal">${esc(W.intro)}</p>
+        </div>
+        ${(W.roles || []).length ? `<ol class="roles">${W.roles.map((r, i) => `
+          <li class="role reveal"><span class="role__num">${pad(i + 1)}</span><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></li>`).join('')}
+        </ol>` : ''}
+        ${W.buttonLabel ? `<div class="wider-team__cta reveal"><a href="index.html#contact" class="btn btn--gold">${esc(W.buttonLabel)}</a></div>` : ''}
+      </div>
+    </section>` : `
     <section class="cta-band"><div class="container cta-band__inner">
       <h2 class="section__title reveal">Let our team craft <em>your experience</em></h2>
       <a href="index.html#contact" class="btn btn--gold reveal">Get in touch</a>
-    </div></section>`;
+    </div></section>`}`;
   }
 
   /* ---------- DESTINATION / EXPERIENCE ---------- */

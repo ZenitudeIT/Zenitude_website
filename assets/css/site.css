@@ -954,3 +954,18 @@ button { font: inherit; background: none; border: 0; color: inherit; }
 .member__photo > img:first-child { object-position: center 20%; }
 @media (max-width: 960px) { .members--2 { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .members--1, .members--2 { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   TEAM PAGE — wider team (text only)
+   ========================================================= */
+.wider-team { overflow: hidden; }
+.wider-team__mark { position: absolute; width: 520px; right: -160px; top: -120px; opacity: .04; pointer-events: none; }
+.roles { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(216, 192, 138, .18); border: 1px solid rgba(216, 192, 138, .18); }
+.role { background: var(--moss-deep); padding: clamp(1.8rem, 3vw, 2.6rem); transition: background .5s var(--ease); }
+.role:hover { background: #1c3a1f; }
+.role__num { display: block; font-family: var(--serif); font-style: italic; font-size: 1.3rem; color: var(--gold-light); margin-bottom: 1.2rem; }
+.role h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.5rem, 2.2vw, 1.85rem); line-height: 1.15; color: var(--ivory); margin-bottom: .7rem; }
+.role p { color: rgba(248, 245, 239, .7); font-size: .98rem; line-height: 1.65; }
+.wider-team__cta { margin-top: clamp(2.5rem, 5vw, 3.5rem); text-align: center; }
+@media (max-width: 960px) { .roles { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .roles { grid-template-columns: 1fr; } }
