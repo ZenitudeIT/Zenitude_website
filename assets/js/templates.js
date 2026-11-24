@@ -74,10 +74,10 @@
       <nav class="nav" id="nav" aria-label="Main">
         <a href="${home('about')}">About</a>
         <a href="${home('services')}">Services</a>
-        <div class="nav__group${active === 'experiences' ? ' is-active' : ''}">
+        ${pub(c.experiences).length ? `<div class="nav__group${active === 'experiences' ? ' is-active' : ''}">
           <a href="${home('experiences')}" class="nav__parent">Experiences</a>
           <div class="nav__drop">${drop(pub(c.experiences), expUrl)}</div>
-        </div>
+        </div>` : ''}
         <div class="nav__group${active === 'destinations' ? ' is-active' : ''}">
           <a href="${home('destinations')}" class="nav__parent">Destinations</a>
           <div class="nav__drop">${drop(pub(c.destinations), destUrl)}</div>
@@ -177,14 +177,43 @@
             <img src="${A}emblem-white.png" alt="" class="frame__fallback-emblem" />
           </div>`;
 
+  /* ---------- four-coasts compass (home + Mauritius page) ---------- */
+  function compassSection(c, id) {
+    const regions = c.regions || [];
+    if (!regions.length) return '';
+    const pos = { north: 'n', east: 'e', south: 's', west: 'w' }, rot = { north: 0, east: 90, south: 180, west: 270 };
+    const r0 = regions[0] || {};
+    return `
+    <section class="stays section" id="${id}">
+      <div class="container">
+        <div class="section__head">
+          <p class="eyebrow reveal">Accommodation</p>
+          <h2 class="section__title reveal">Four coasts, <em>one compass</em></h2>
+          <p class="section__intro reveal">We help you select the perfect hotel or villa within your budget. Choose a coast of Mauritius to explore.</p>
+        </div>
+        <div class="compass reveal">
+          <div class="compass__wheel">
+            <img src="${A}emblem-green.png" alt="" class="compass__emblem" id="compassEmblem" />
+            ${regions.filter((r) => pos[r.key]).map((r, i) => `<button class="compass__pt compass__pt--${pos[r.key]}${i === 0 ? ' is-active' : ''}" data-key="${esc(r.key)}" data-title="${esc(r.title)}" data-kicker="${esc(r.kicker)}" data-desc="${esc(r.desc)}" data-rot="${rot[r.key]}">${esc(r.key[0].toUpperCase() + r.key.slice(1))}</button>`).join('')}
+          </div>
+          <div class="compass__panel" aria-live="polite">
+            <p class="compass__kicker" id="regionKicker">${esc(r0.kicker)}</p>
+            <h3 class="compass__title" id="regionTitle">${esc(r0.title)}</h3>
+            <p class="compass__desc" id="regionDesc">${esc(r0.desc)}</p>
+            <a href="${esc(staysUrl(r0.key || 'north'))}" class="btn btn--green" id="stayLink">Find my stay</a>
+          </div>
+        </div>
+      </div>
+    </section>`;
+  }
+
   /* ---------- HOME ---------- */
   function pageHome(c) {
     const H = c.home || {};
     const exps = pub(c.experiences), dests = pub(c.destinations), tests = pub(c.testimonials);
     const regions = c.regions || [];
-    const pos = { north: 'n', east: 'e', south: 's', west: 'w' }, rot = { north: 0, east: 90, south: 180, west: 270 };
-    const r0 = regions[0] || {};
     const marquee = H.marquee || [];
+    const titleLines = String(H.heroTitle || '').split('\n').map((l) => l.trim()).filter(Boolean);
     const video = vidSrc(H.heroVideo);
     const videoMobile = vidSrc(H.heroVideoMobile);
     const poster = img(H.heroPoster);
@@ -203,12 +232,16 @@
         </svg>
       </div>
       <div class="hero__content container">
-        <p class="eyebrow eyebrow--light reveal">${esc(H.heroEyebrow)}</p>
-        <h1 class="hero__title">${String(H.heroTitle || '').split('\n').map((l) => `<span class="line"><span>${esc(l).replace(/\*(.+?)\*/g, '<em>$1</em>')}</span></span>`).join('')}</h1>
-        <p class="hero__lead reveal">${esc(H.heroLead)}</p>
+        <p class="eyebrow eyebrow--light reveal hero__eyebrow">${esc(H.heroEyebrow)}</p>
+        <div class="hero__middle">${titleLines.length ? `
+          <h1 class="hero__title">${titleLines.map((l) => `<span class="line"><span>${esc(l).replace(/\*(.+?)\*/g, '<em>$1</em>')}</span></span>`).join('')}</h1>` : ''}
+        </div>
+        <div class="hero__bottom">
+        ${H.heroLead ? `<p class="hero__lead reveal${titleLines.length ? '' : ' hero__lead--big'}">${rich(H.heroLead)}</p>` : ''}
         <div class="hero__actions reveal">
           <a href="#contact" class="btn btn--gold">Plan your experience</a>
           <a href="#services" class="btn btn--ghost">Discover our services</a>
+        </div>
         </div>
       </div>
       <a href="#about" class="hero__scroll" aria-label="Scroll to content"><span>Scroll</span><i></i></a>
@@ -239,7 +272,8 @@
           <ul class="stats reveal">
             <li><strong data-count="${dests.length}">${dests.length}</strong><span>Island<br />destinations</span></li>
             <li><strong>24/7</strong><span>Tailored<br />assistance</span></li>
-            <li><strong data-count="${exps.length}">${exps.length}</strong><span>Realms —<br />air, land &amp; sea</span></li>
+            ${exps.length ? `<li><strong data-count="${exps.length}">${exps.length}</strong><span>Realms —<br />air, land &amp; sea</span></li>`
+              : `<li><strong data-count="${regions.length}">${regions.length}</strong><span>Coasts of<br />Mauritius</span></li>`}
           </ul>
         </div>
       </div>
@@ -263,8 +297,10 @@
       </div>
     </section>
 
+    ${exps.length || (c.transfers || []).length ? `
     <section class="experiences section section--dark" id="experiences">
       <div class="container">
+        ${exps.length ? `
         <div class="section__head section__head--split">
           <div><p class="eyebrow eyebrow--light reveal">Experiences</p><h2 class="section__title reveal">By air, by land, <em>by sea</em></h2></div>
           <p class="section__intro reveal">Choose your element. We orchestrate the rest — the timing, the people, the small details that turn an outing into a memory.</p>
@@ -276,34 +312,14 @@
             <span class="realm__icon">${icon(x.slug)}</span>
             <div class="realm__body"><h3>${esc(x.name)}</h3><p>${esc(x.summary)}</p><a href="${esc(expUrl(x.slug))}" class="link">Explore ${esc(String(x.name).toLowerCase())}</a></div>
           </article>`).join('')}
-        </div>
+        </div>` : `
+        <div class="section__head"><p class="eyebrow eyebrow--light reveal">Transfers</p><h2 class="section__title reveal">Arrive and travel <em>in style</em></h2></div>`}
         ${(c.transfers || []).length ? `<div class="transfers">${c.transfers.map((t, i) => `
           <div class="transfer${i % 2 ? ' transfer--gold' : ''} reveal"><p class="eyebrow eyebrow--light">Transfers</p><h3>${esc(t.name)}</h3><p>${esc(t.text)}</p></div>`).join('')}</div>` : ''}
       </div>
-    </section>
-
-    ${regions.length ? `
-    <section class="stays section" id="stays">
-      <div class="container">
-        <div class="section__head">
-          <p class="eyebrow reveal">Accommodation</p>
-          <h2 class="section__title reveal">Four coasts, <em>one compass</em></h2>
-          <p class="section__intro reveal">We help you select the perfect hotel or villa within your budget. Choose a coast of Mauritius to explore.</p>
-        </div>
-        <div class="compass reveal">
-          <div class="compass__wheel">
-            <img src="${A}emblem-green.png" alt="" class="compass__emblem" id="compassEmblem" />
-            ${regions.filter((r) => pos[r.key]).map((r, i) => `<button class="compass__pt compass__pt--${pos[r.key]}${i === 0 ? ' is-active' : ''}" data-key="${esc(r.key)}" data-title="${esc(r.title)}" data-kicker="${esc(r.kicker)}" data-desc="${esc(r.desc)}" data-rot="${rot[r.key]}">${esc(r.key[0].toUpperCase() + r.key.slice(1))}</button>`).join('')}
-          </div>
-          <div class="compass__panel" aria-live="polite">
-            <p class="compass__kicker" id="regionKicker">${esc(r0.kicker)}</p>
-            <h3 class="compass__title" id="regionTitle">${esc(r0.title)}</h3>
-            <p class="compass__desc" id="regionDesc">${esc(r0.desc)}</p>
-            <a href="${esc(staysUrl(r0.key || 'north'))}" class="btn btn--green" id="stayLink">Find my stay</a>
-          </div>
-        </div>
-      </div>
     </section>` : ''}
+
+    ${compassSection(c, 'stays')}
 
     <section class="destinations section section--cream" id="destinations">
       <div class="container">
@@ -464,6 +480,8 @@
         <aside class="facts facts--quote reveal"><img src="${A}emblem-gold.png" alt="" class="facts__mark" /><p>${esc(item.summary)}</p></aside>`}
       </div>
     </section>
+
+    ${isDest && item.slug === 'mauritius' ? compassSection(c, 'coasts') : ''}
 
     ${(item.highlights || []).length ? `
     <section class="section section--cream highlights">

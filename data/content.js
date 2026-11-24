@@ -53,21 +53,21 @@ window.ZEN_DEFAULT_CONTENT = {
   },
   "services": [
     {
-      "title": "Personal Excellence",
-      "text": "Your own dedicated concierge and private butler — swift, attentive and always one step ahead.",
-      "items": [
-        "Dedicated concierge agents",
-        "Private butler service",
-        "Tailored assistance around the clock"
-      ]
-    },
-    {
       "title": "Luxury Pursuits",
       "text": "Days on the open ocean and moments well beyond the ordinary, arranged entirely around you.",
       "items": [
         "Private yacht charters",
         "Premium fishing expeditions",
         "Exclusive, one-of-a-kind experiences"
+      ]
+    },
+    {
+      "title": "Personal Excellence",
+      "text": "Your own dedicated concierge and private butler — swift, attentive and always one step ahead.",
+      "items": [
+        "Dedicated concierge agents",
+        "Private butler service",
+        "Tailored assistance around the clock"
       ]
     },
     {
@@ -84,7 +84,7 @@ window.ZEN_DEFAULT_CONTENT = {
     {
       "slug": "air",
       "name": "Air",
-      "published": true,
+      "published": false,
       "tagline": "See the islands from above",
       "summary": "Helicopter tours and seaplane flights over turquoise lagoons, waterfalls and the iconic underwater-waterfall illusion of Le Morne.",
       "intro": "Some views can only be appreciated from the sky. We arrange private helicopter and seaplane flights timed for the best light, with smooth ground transfers on either side.\n\nWhether it is a scenic discovery flight, a dramatic arrival at your resort or a special-occasion surprise, every detail is coordinated for you.",
@@ -111,7 +111,7 @@ window.ZEN_DEFAULT_CONTENT = {
     {
       "slug": "land",
       "name": "Land",
-      "published": true,
+      "published": false,
       "tagline": "Private journeys inland",
       "summary": "Private guided excursions, nature reserves, tea routes, rum distilleries and cultural heritage — with your own friendly driver and guide.",
       "intro": "Beyond the beaches lies an island of volcanic peaks, tea plantations, colonial houses and vibrant markets. Our drivers and guides know it intimately.\n\nWe design each day around your pace and interests, with private vehicles and guides who stay in touch with you throughout.",
@@ -138,7 +138,7 @@ window.ZEN_DEFAULT_CONTENT = {
     {
       "slug": "sea",
       "name": "Sea",
-      "published": true,
+      "published": false,
       "tagline": "The Indian Ocean, privately yours",
       "summary": "Private catamaran and yacht charters, deep-sea fishing, dolphin encounters and secluded island picnics.",
       "intro": "The ocean is at the heart of island life. From a sunset cruise to a full day of deep-sea fishing, we arrange private charters with experienced crews.\n\nTell us how you like to spend a day at sea and we will take care of the boat, the crew, the menu and the transfers.",
@@ -249,7 +249,7 @@ window.ZEN_DEFAULT_CONTENT = {
     {
       "slug": "rodrigues",
       "name": "Rodrigues",
-      "published": true,
+      "published": false,
       "theme": "ro",
       "tagline": "The authentic island, untouched by time",
       "summary": "Authentic, unhurried and wonderfully preserved — the island time forgot.",

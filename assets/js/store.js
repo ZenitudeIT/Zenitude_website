@@ -22,6 +22,22 @@
     for (const k of Object.keys(DEFAULT)) if (!(k in out)) out[k] = clone(DEFAULT[k]);
     return out;
   };
+  /* One-time content updates. Each runs once per saved content (its id is recorded in
+     content._migrations), so anything changed later in the admin is never overwritten. */
+  const MIGRATIONS = [
+    ['2026-11-hide-experiences', (c) => { (c.experiences || []).forEach((x) => { x.published = false; }); }],
+    ['2026-11-hide-rodrigues', (c) => { (c.destinations || []).forEach((d) => { if (d.slug === 'rodrigues') d.published = false; }); }],
+    ['2026-11-personal-excellence-middle', (c) => {
+      const s = c.services || [];
+      const i = s.findIndex((x) => /personal excellence/i.test(x.title || ''));
+      if (i > -1 && s.length >= 3 && i !== 1) { const [x] = s.splice(i, 1); s.splice(1, 0, x); }
+    }],
+  ];
+  const migrate = (c) => {
+    if (!Array.isArray(c._migrations)) c._migrations = [];
+    for (const [id, fn] of MIGRATIONS) if (!c._migrations.includes(id)) { try { fn(c); } catch (e) {} c._migrations.push(id); }
+    return c;
+  };
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const nowISO = () => new Date().toISOString();
 
@@ -76,7 +92,7 @@
 
   const local = {
     mode: 'local',
-    async getContent() { return withDefaults(clone(LS.get('zen:content', null) || DEFAULT)); },
+    async getContent() { return migrate(withDefaults(clone(LS.get('zen:content', null) || DEFAULT))); },
     async saveContent(c, by) {
       const prev = LS.get('zen:content', null) || DEFAULT;
       {
@@ -161,9 +177,9 @@
     async getContent() {
       try {
         const snap = await (await db()).doc('site/content').get();
-        if (snap.exists && snap.data().json) return withDefaults(JSON.parse(snap.data().json));
+        if (snap.exists && snap.data().json) return migrate(withDefaults(JSON.parse(snap.data().json)));
       } catch (e) { console.warn('[ZenStore] using default content:', e.message); }
-      return clone(DEFAULT);
+      return migrate(clone(DEFAULT));
     },
     async saveContent(c, by) {
       const d = await db();
