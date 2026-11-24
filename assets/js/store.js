@@ -27,6 +27,7 @@
   const MIGRATIONS = [
     ['2026-11-hide-experiences', (c) => { (c.experiences || []).forEach((x) => { x.published = false; }); }],
     ['2026-11-hide-rodrigues', (c) => { (c.destinations || []).forEach((d) => { if (d.slug === 'rodrigues') d.published = false; }); }],
+    ['2026-11-show-rodrigues-again', (c) => { (c.destinations || []).forEach((d) => { if (d.slug === 'rodrigues') d.published = true; }); }],
     ['2026-11-personal-excellence-middle', (c) => {
       const s = c.services || [];
       const i = s.findIndex((x) => /personal excellence/i.test(x.title || ''));

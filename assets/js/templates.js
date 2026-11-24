@@ -319,8 +319,6 @@
       </div>
     </section>` : ''}
 
-    ${compassSection(c, 'stays')}
-
     <section class="destinations section section--cream" id="destinations">
       <div class="container">
         <div class="section__head section__head--split">
@@ -355,18 +353,6 @@
         </div>
       </div>
     </section>` : ''}
-
-    <section class="team section" id="team">
-      <div class="container team__grid">
-        <div class="team__text">
-          <p class="eyebrow reveal">The Team</p>
-          <h2 class="section__title reveal">${rich(H.teamTitle)}</h2>
-          <p class="reveal">${esc(H.teamText)}</p>
-          <a href="team.html" class="btn btn--green reveal">Meet the team</a>
-        </div>
-        <div class="team__media reveal"><a href="team.html" aria-label="Meet the team">${frame(H.teamImage, 'The Zenitude Concierge team', 'frame--wide')}</a></div>
-      </div>
-    </section>
 
     <section class="b2b" id="b2b">
       <div class="container b2b__inner">
@@ -534,7 +520,7 @@
     <section class="page-hero page-hero--stay page-hero--stay-${esc(r.key)}">
       <img src="${A}emblem-white.png" alt="" class="hero__watermark" aria-hidden="true" />
       <div class="container page-hero__content">
-        <nav class="crumbs reveal" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="${home('stays')}">Accommodation</a><span>/</span>${esc(r.title || cap(r.key))}</nav>
+        <nav class="crumbs reveal" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="${esc(destUrl('mauritius') + '#coasts')}">Accommodation</a><span>/</span>${esc(r.title || cap(r.key))}</nav>
         <p class="eyebrow eyebrow--light reveal">${esc(r.kicker)}</p>
         <h1 class="page-hero__title reveal">Stays in <em>${esc(String(r.title || cap(r.key)).replace(/^the\s+/i, 'the '))}</em></h1>
         <p class="page-hero__lead reveal">${esc(r.desc)}</p>

@@ -249,7 +249,7 @@ window.ZEN_DEFAULT_CONTENT = {
     {
       "slug": "rodrigues",
       "name": "Rodrigues",
-      "published": false,
+      "published": true,
       "theme": "ro",
       "tagline": "The authentic island, untouched by time",
       "summary": "Authentic, unhurried and wonderfully preserved — the island time forgot.",
