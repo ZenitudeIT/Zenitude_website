@@ -11,9 +11,15 @@
   const rich = (s) => esc(s).replace(/\*(.+?)\*/gs, '<em>$1</em>').replace(/\n/g, '<br>');
   const paras = (s, cls = '') => String(s || '').trim().split(/\n\s*\n/).filter((p) => p.trim())
     .map((p) => `<p${cls ? ` class="${cls}"` : ''}>${esc(p.trim()).replace(/\n/g, '<br>')}</p>`).join('');
+  // Library images stored in Firestore are written "media:<id>". They render first as a
+  // transparent pixel tagged with the id, then resolveMedia() swaps in the real image.
+  const PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+  const MEDIA_TOKEN = /data:image\/gif;base64,R0lGODlhAQABAAAAACw=#media=([A-Za-z0-9]{1,64})/g;
   const img = (src) => {
     src = String(src || '').trim();
     if (!src) return '';
+    const m = /^media:([A-Za-z0-9]{1,64})$/.exec(src);
+    if (m) return PIXEL + '#media=' + m[1];
     if (/^https?:\/\//i.test(src) || /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(src)) return src;
     if (/^[a-z][a-z0-9+.-]*:/i.test(src)) return ''; // block javascript:, etc.
     return src.replace(/^\/+/, '');
@@ -596,6 +602,27 @@
     <section class="section"><div class="container text-page">${paras(P.body || 'Content coming soon.', 'reveal')}</div></section>`;
   }
 
+  /* ---------- swap media placeholders for the real images ---------- */
+  async function resolveMedia() {
+    const attrs = ['src', 'href', 'style'];
+    const nodes = [];
+    const ids = new Set();
+    document.querySelectorAll('[src*="#media="],[href*="#media="],[style*="#media="]').forEach((el) => {
+      attrs.forEach((a) => {
+        const v = el.getAttribute(a);
+        if (v && v.includes('#media=')) { nodes.push([el, a]); v.replace(MEDIA_TOKEN, (_, id) => ids.add(id)); }
+      });
+    });
+    if (!ids.size || !window.ZenStore.getMedia) return;
+    const map = {};
+    await Promise.all([...ids].map(async (id) => { map[id] = await window.ZenStore.getMedia(id).catch(() => ''); }));
+    nodes.forEach(([el, a]) => {
+      const v = el.getAttribute(a);
+      // A missing image becomes an invalid source, so the existing "branded fallback" kicks in.
+      el.setAttribute(a, v.replace(MEDIA_TOKEN, (_, id) => map[id] || (a === 'src' ? 'data:,' : '')));
+    });
+  }
+
   /* ---------- boot ---------- */
   async function boot() {
     const main = document.getElementById('top');
@@ -617,6 +644,7 @@
     main.innerHTML = html;
     document.getElementById('site-footer').outerHTML = footer(c);
     window.ZenSite.init();
+    resolveMedia();
   }
 
   window.ZenTemplates = { esc, img };

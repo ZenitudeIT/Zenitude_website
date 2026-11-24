@@ -32,13 +32,23 @@
     return el;
   }
   const clone = (o) => JSON.parse(JSON.stringify(o));
+  const PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+  const MEDIA_RE = /^media:([A-Za-z0-9]{1,64})$/;
   const imgSrc = (p) => {
     p = String(p || '').trim();
     if (!p) return '';
+    if (MEDIA_RE.test(p)) return PIXEL;
     if (/^https?:\/\//i.test(p) || /^data:image\//i.test(p)) return p;
     if (/^[a-z][a-z0-9+.-]*:/i.test(p)) return '';
     return '../' + p.replace(/^\/+/, '');
   };
+  // <img> for any image value; library images ("media:<id>") are loaded from the database.
+  function previewImg(p, attrs = {}) {
+    const el = h('img', { ...attrs, src: imgSrc(p) });
+    const m = MEDIA_RE.exec(String(p || '').trim());
+    if (m && Store.getMedia) Store.getMedia(m[1]).then((u) => { if (u) el.src = u; else el.src = 'data:,'; }).catch(() => { el.src = 'data:,'; });
+    return el;
+  }
   const fmtDate = (s) => { const d = new Date(s); return isNaN(d) ? '' : d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }); };
   const fmtSize = (b) => b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round((b || 0) / 1024)) + ' KB';
   const slugify = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -276,12 +286,13 @@
     const wrap = h('div', { class: 'imgf' });
     const draw = () => {
       const v = obj[key] || '';
-      const shown = /^data:/.test(v) ? '(image stored in browser)' : v;
-      const thumb = v ? h('img', { src: imgSrc(v), alt: '', onerror: (e) => e.target.replaceWith(h('span', { class: 'imgf__broken', text: 'Not loading' })) }) : h('span', { class: 'imgf__empty', text: 'No image' });
+      const fromLibrary = /^data:/.test(v) || MEDIA_RE.test(v);
+      const shown = /^data:/.test(v) ? '(image stored in browser)' : MEDIA_RE.test(v) ? '(image from the media library)' : v;
+      const thumb = v ? previewImg(v, { alt: '', onerror: (e) => e.target.replaceWith(h('span', { class: 'imgf__broken', text: 'Not loading' })) }) : h('span', { class: 'imgf__empty', text: 'No image' });
       wrap.replaceChildren(
         h('div', { class: 'imgf__thumb' }, thumb),
         h('div', { class: 'imgf__side' },
-          h('input', { type: 'text', value: shown, placeholder: 'https://… or assets/photos/photo.jpg', readonly: /^data:/.test(v), onchange: (e) => { obj[key] = e.target.value.trim(); markDirty(); draw(); } }),
+          h('input', { type: 'text', value: shown, placeholder: 'https://… or assets/photos/photo.jpg', readonly: fromLibrary, onchange: (e) => { obj[key] = e.target.value.trim(); markDirty(); draw(); } }),
           h('div', { class: 'imgf__btns' },
             h('button', { class: 'btn btn--ghost btn--sm', type: 'button', onclick: async () => { const p = await pickMedia(false); if (p) { obj[key] = p[0]; markDirty(); draw(); } } }, 'Choose from library'),
             h('label', { class: 'btn btn--ghost btn--sm' }, 'Upload new', h('input', { type: 'file', accept: 'image/*', hidden: true, onchange: async (e) => { const r = await uploadFiles(e.target.files); if (r[0]) { obj[key] = r[0]; markDirty(); draw(); } } })),
@@ -297,7 +308,7 @@
     const draw = () => {
       wrap.replaceChildren(
         ...obj[key].map((p, i) => h('div', { class: 'gal__item' },
-          h('img', { src: imgSrc(p), alt: '', loading: 'lazy' }),
+          previewImg(p, { alt: '', loading: 'lazy' }),
           h('div', { class: 'gal__acts' },
             h('button', { class: 'icon-btn', type: 'button', title: 'Move left', disabled: i === 0, onclick: () => { [obj[key][i - 1], obj[key][i]] = [obj[key][i], obj[key][i - 1]]; markDirty(); draw(); } }, '←'),
             h('button', { class: 'icon-btn icon-btn--danger', type: 'button', title: 'Remove', onclick: () => { obj[key].splice(i, 1); markDirty(); draw(); } }, '×')))),
@@ -319,7 +330,7 @@
           const isOpen = open.has(item);
           return h('div', { class: 'item' + (isOpen ? ' is-open' : '') + (item.published === false ? ' is-hidden' : '') },
             h('div', { class: 'item__head', onclick: (e) => { if (e.target.closest('button, a')) return; isOpen ? open.delete(item) : open.add(item); draw(); } },
-              cfg.thumbKey ? h('span', { class: 'item__thumb' }, item[cfg.thumbKey] ? h('img', { src: imgSrc(item[cfg.thumbKey]), alt: '', onerror: (e) => e.target.remove() }) : null) : h('span', { class: 'item__num', text: String(i + 1).padStart(2, '0') }),
+              cfg.thumbKey ? h('span', { class: 'item__thumb' }, item[cfg.thumbKey] ? previewImg(item[cfg.thumbKey], { alt: '', onerror: (e) => e.target.remove() }) : null) : h('span', { class: 'item__num', text: String(i + 1).padStart(2, '0') }),
               h('div', { class: 'item__text' }, title, sub),
               item.published === false ? h('span', { class: 'chip chip--muted', text: 'Hidden' }) : null,
               cfg === SECTIONS.stays && item.region ? h('a', { class: 'icon-btn', href: `../stays.html?region=${encodeURIComponent(item.region)}`, target: '_blank', title: 'View coast page (saved version)' }, '↗') : null,
@@ -355,9 +366,10 @@
       grid.replaceChildren(...(media.length ? media.map((m) => {
         const card = h('button', { class: 'media-card', type: 'button', onclick: () => {
           if (!multi) { chosen.clear(); grid.querySelectorAll('.is-picked').forEach((c) => c.classList.remove('is-picked')); }
-          chosen.has(m.url) ? chosen.delete(m.url) : chosen.add(m.url);
-          card.classList.toggle('is-picked', chosen.has(m.url));
-        }, ondblclick: () => { if (!multi) { chosen.clear(); chosen.add(m.url); modal.close('use'); } } },
+          const val = m.ref || m.url;
+          chosen.has(val) ? chosen.delete(val) : chosen.add(val);
+          card.classList.toggle('is-picked', chosen.has(val));
+        }, ondblclick: () => { if (!multi) { chosen.clear(); chosen.add(m.ref || m.url); modal.close('use'); } } },
           h('img', { src: m.url, alt: '', loading: 'lazy' }), h('span', { text: m.name }));
         return card;
       }) : [h('p', { class: 'muted', text: 'No images yet — upload some.' })]));
@@ -542,12 +554,12 @@
   }
 
   async function viewMedia(view) {
-    setHead('Media library', LOCAL ? 'Images are stored in this browser until Firebase is connected.' : 'Upload photos once, then use them anywhere on the site.');
+    setHead('Media library', LOCAL ? 'Images are stored in this browser until Firebase is connected.' : 'Upload photos once, then use them anywhere on the site. Photos are compressed and stored in your Firebase database (free plan).');
     const grid = h('div', { class: 'media-grid' });
     const drop = h('label', { class: 'drop' },
       h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif', multiple: true, hidden: true, onchange: async (e) => { await uploadFiles(e.target.files); e.target.value = ''; load(); } }),
       h('strong', { text: 'Drop images here or click to upload' }),
-      h('span', { class: 'muted', text: LOCAL ? 'Demo mode: images are compressed and kept in this browser (a few MB max).' : 'JPG, PNG, WebP or GIF · large photos are resized automatically' }));
+      h('span', { class: 'muted', text: LOCAL ? 'Demo mode: images are compressed and kept in this browser (a few MB max).' : 'JPG, PNG, WebP or GIF · photos are resized to max 1800 px and compressed automatically' }));
     ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('is-over'); }));
     ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('is-over'); }));
     drop.addEventListener('drop', async (e) => { await uploadFiles(e.dataTransfer.files); load(); });
@@ -555,15 +567,15 @@
       const media = await Store.listMedia();
       const used = JSON.stringify(content);
       grid.replaceChildren(...(media.length ? media.map((m) => {
-        const inUse = used.includes(m.url);
+        const inUse = used.includes(m.ref || m.url);
         return h('div', { class: 'media-card media-card--static' },
-          h('a', { href: m.url, target: '_blank' }, h('img', { src: m.url, alt: '', loading: 'lazy' })),
+          h('img', { src: m.url, alt: '', loading: 'lazy' }),
           h('div', { class: 'media-card__meta' },
             h('span', { class: 'media-card__name', text: m.name, title: m.name }),
             h('small', { class: 'muted', text: [m.w && m.h ? `${m.w}×${m.h}` : '', fmtSize(m.size)].filter(Boolean).join(' · ') }),
             inUse ? h('span', { class: 'chip chip--replied', text: 'In use' }) : h('span', { class: 'chip chip--muted', text: 'Unused' })),
           h('div', { class: 'media-card__acts' },
-            LOCAL ? null : h('button', { class: 'btn btn--ghost btn--sm', onclick: () => { navigator.clipboard?.writeText(m.url); toast('Image link copied'); } }, 'Copy link'),
+
             h('button', { class: 'btn btn--danger-ghost btn--sm', onclick: async () => {
               if (!(await confirmBox(inUse ? `“${m.name}” is used on the website. Deleting it will leave an empty image there. Delete anyway?` : `Delete “${m.name}”?`))) return;
               try { await Store.deleteMedia(m); toast('Image deleted'); load(); } catch (e) { fail(e); }

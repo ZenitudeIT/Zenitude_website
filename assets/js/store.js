@@ -26,7 +26,7 @@
   const nowISO = () => new Date().toISOString();
 
   /* ---------- shared: resize an image file in the browser ---------- */
-  function resizeImage(file, max = 2400, quality = 0.85) {
+  function resizeImage(file, max = 2400, quality = 0.85, forceJpeg = false) {
     return new Promise((resolve, reject) => {
       if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) return reject(new Error('Only JPG, PNG, WebP or GIF images are allowed.'));
       if (file.size > 15 * 1024 * 1024) return reject(new Error('Images must be under 15 MB.'));
@@ -38,8 +38,10 @@
         const w = Math.round(img.width * r), h = Math.round(img.height * r);
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const type = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const type = file.type === 'image/png' && !forceJpeg ? 'image/png' : 'image/jpeg';
+        const ctx = canvas.getContext('2d');
+        if (type === 'image/jpeg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); }
+        ctx.drawImage(img, 0, 0, w, h);
         canvas.toBlob((blob) => blob ? resolve({ blob, type, w, h }) : reject(new Error('Could not process the image.')), type, quality);
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('This file is not a readable image.')); };
@@ -47,6 +49,16 @@
     });
   }
   const blobToDataURL = (blob) => new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(blob); });
+  // A Firestore document holds max 1 MiB; base64 adds ~33%, so keep the image itself under ~700 KB.
+  const MEDIA_MAX_BYTES = 700 * 1024;
+  async function compressForDoc(file) {
+    const steps = [[1800, 0.82, false], [1600, 0.78, false], [1600, 0.75, true], [1400, 0.72, true], [1200, 0.7, true], [1000, 0.66, true]];
+    for (const [max, q, jpeg] of steps) {
+      const r = await resizeImage(file, max, q, jpeg);
+      if (r.blob.size <= MEDIA_MAX_BYTES) return r;
+    }
+    throw new Error('This image could not be made small enough — try a smaller image.');
+  }
   const safeName = (name, ext) => (String(name).replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'image') + '-' + uid().slice(-6) + '.' + ext;
 
   /* =========================================================
@@ -102,7 +114,8 @@
       LS.set('zen:media', media);
       return item.url;
     },
-    async listMedia() { return LS.get('zen:media', []); },
+    async listMedia() { return LS.get('zen:media', []).map((m) => ({ ...m, ref: m.url })); },
+    async getMedia() { return ''; },
     async deleteMedia(item) { LS.set('zen:media', LS.get('zen:media', []).filter((m) => m.id !== item.id)); },
 
     auth: {
@@ -139,6 +152,7 @@
     if (!firebase.apps.length) firebase.initializeApp(cfg);
     return firebase;
   }
+  const mediaMem = new Map(); // id → data URL (or pending promise)
   const db = async () => (await fb(['firestore'])).firestore();
   const ts = (v) => (v && v.toDate ? v.toDate().toISOString() : v || '');
 
@@ -183,23 +197,39 @@
     async updateEnquiry(id, patch) { await (await db()).doc('enquiries/' + id).update(patch); },
     async deleteEnquiry(id) { await (await db()).doc('enquiries/' + id).delete(); },
 
+    /* Images live in Firestore (collection "media"), one compressed image per document,
+       so no paid Firebase Storage plan is needed. Content refers to them as "media:<id>". */
     async uploadImage(file) {
-      const { blob, type } = await resizeImage(file, 2400, 0.85);
-      const f = await fb(['storage']);
-      const ref = f.storage().ref('uploads/' + safeName(file.name, type === 'image/png' ? 'png' : 'jpg'));
-      await ref.put(blob, { contentType: type, cacheControl: 'public,max-age=31536000' });
-      return ref.getDownloadURL();
+      const { blob, type, w, h } = await compressForDoc(file);
+      const data = await blobToDataURL(blob);
+      const ref = (await db()).collection('media').doc();
+      await ref.set({ name: safeName(file.name, type === 'image/png' ? 'png' : 'jpg'), type, w, h, size: blob.size, data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      mediaMem.set(ref.id, data);
+      return 'media:' + ref.id;
     },
     async listMedia() {
-      const f = await fb(['storage']);
-      const res = await f.storage().ref('uploads').listAll();
-      const items = await Promise.all(res.items.map(async (r) => {
-        const [url, meta] = await Promise.all([r.getDownloadURL(), r.getMetadata()]);
-        return { id: r.fullPath, name: r.name, url, size: meta.size, created: meta.timeCreated };
-      }));
-      return items.sort((a, b) => String(b.created).localeCompare(String(a.created)));
+      const q = await (await db()).collection('media').orderBy('createdAt', 'desc').limit(300).get();
+      return q.docs.map((d) => {
+        const m = d.data();
+        mediaMem.set(d.id, m.data);
+        return { id: d.id, ref: 'media:' + d.id, name: m.name, url: m.data, w: m.w, h: m.h, size: m.size, created: ts(m.createdAt) };
+      });
     },
-    async deleteMedia(item) { const f = await fb(['storage']); await f.storage().ref(item.id).delete(); },
+    async deleteMedia(item) { await (await db()).doc('media/' + item.id).delete(); mediaMem.delete(item.id); try { sessionStorage.removeItem('zen:m:' + item.id); } catch (e) {} },
+    async getMedia(id) {
+      if (!/^[A-Za-z0-9]{1,64}$/.test(id)) return '';
+      if (mediaMem.has(id)) return mediaMem.get(id);
+      try { const c = sessionStorage.getItem('zen:m:' + id); if (c) { mediaMem.set(id, c); return c; } } catch (e) {}
+      const p = (async () => {
+        const snap = await (await db()).doc('media/' + id).get();
+        const v = snap.exists ? snap.data().data || '' : '';
+        mediaMem.set(id, v);
+        if (v) { try { sessionStorage.setItem('zen:m:' + id, v); } catch (e) {} }
+        return v;
+      })().catch(() => { mediaMem.delete(id); return ''; });
+      mediaMem.set(id, p);
+      return p;
+    },
 
     auth: {
       needsLogin: true,

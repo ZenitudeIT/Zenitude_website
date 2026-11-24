@@ -35,6 +35,20 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Image library: photos compressed by the admin, one per document (max ~1 MB).
+    // Public can view; only website admins can add or delete. Never edited in place.
+    match /media/{id} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'type', 'w', 'h', 'size', 'data', 'createdAt'])
+        && request.resource.data.type in ['image/jpeg', 'image/png']
+        && request.resource.data.data is string
+        && request.resource.data.data.size() < 1000000
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
     // Admin list: a user may only check their own entry. Nobody can write from the website.
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
