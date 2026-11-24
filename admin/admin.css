@@ -274,3 +274,5 @@ form.panel .grid-fields { width: 100%; grid-template-columns: 1fr; }
 .steps code, .panel code { background: var(--cream); padding: .1rem .4rem; border-radius: 4px; font-size: .85em; }
 .btn-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .4rem; }
 .mode-chip { margin-left: auto; font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; padding: .15rem .5rem; border-radius: 99px; background: rgba(216, 192, 138, .18); color: var(--gold-light); }
+.vidf { display: grid; gap: .5rem; }
+.vidf__preview { width: 100%; max-width: 420px; aspect-ratio: 16 / 9; background: var(--moss-ink); border-radius: var(--r); object-fit: cover; }

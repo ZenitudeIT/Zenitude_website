@@ -113,6 +113,12 @@
       title: 'Home page', icon: '⌂', kind: 'object', desc: 'Texts and images on the home page.',
       groups: [
         ['Hero', [T('heroEyebrow', 'Small line above the title'), TA('heroTitle', 'Main title', { rows: 3, hint: 'One line per row. ' + ITALIC }), TA('heroLead', 'Intro sentence', { rows: 2 })]],
+        ['Hero video (optional)', [
+          { type: 'video', key: 'heroVideo', label: 'Background video (MP4)', hint: 'Plays silently on a loop behind the title when the site opens. Use a link to an .mp4 file, or a file in the repository such as assets/video/hero.mp4. Aim for 10–30 seconds and under 10 MB. Leave empty to keep the current design.' },
+          { type: 'video', key: 'heroVideoMobile', label: 'Phone version (optional)', hint: 'A smaller/vertical version for phones. If empty, phones get the main video.' },
+          IMG('heroPoster', 'Still image shown while the video loads', { hint: 'Ideally the first frame of the video. Also shown to visitors who turned off animations or use data-saver.' }),
+          SEL('heroVideoSound', 'Does the video have sound?', [['', 'No — silent video'], ['yes', 'Yes — show a sound on/off button (starts muted)']]),
+        ]],
         ['Scrolling band', [STR('marquee', 'Words in the gold scrolling band')]],
         ['About', [T('aboutEyebrow', 'Small heading'), T('aboutTitle', 'Title', { hint: ITALIC }), TA('aboutText', 'Text', { rows: 6, hint: 'Leave an empty line between paragraphs.' }), IMG('aboutImage', 'Photo'), TA('aboutBadge', 'Badge text', { rows: 2 })]],
         ['Services intro', [T('servicesTitle', 'Title', { hint: ITALIC }), TA('servicesIntro', 'Intro', { rows: 2 })]],
@@ -223,6 +229,23 @@
           oninput: (e) => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'); update(e.target.value); },
           onchange: (e) => { e.target.value = slugify(e.target.value); update(e.target.value); } });
         return field(f.label, h('div', { class: 'slug' }, input, preview), 'Lowercase letters, numbers and dashes. Changing it changes the page link.');
+      }
+      case 'video': {
+        const preview = h('video', { class: 'vidf__preview', muted: true, loop: true, playsinline: true, controls: true, preload: 'metadata' });
+        const status = h('small', { class: 'f__hint' });
+        const show = (v) => {
+          const src = String(v || '').trim();
+          const ok = src && (/^https?:\/\//i.test(src) || !/^[a-z][a-z0-9+.-]*:/i.test(src));
+          preview.hidden = !ok;
+          status.textContent = '';
+          if (ok) { preview.src = /^https?:/i.test(src) ? src : '../' + src.replace(/^\/+/, ''); }
+          else preview.removeAttribute('src');
+        };
+        preview.addEventListener('error', () => { if (preview.getAttribute('src')) status.textContent = '⚠ This video could not be loaded — check the link or file path.'; });
+        preview.addEventListener('loadedmetadata', () => { status.textContent = `✓ ${preview.videoWidth}×${preview.videoHeight}, ${Math.round(preview.duration)} s`; });
+        const input = h('input', { type: 'text', value: obj[f.key] ?? '', placeholder: 'assets/video/hero.mp4 or https://…/video.mp4', oninput: (e) => set(e.target.value.trim()), onchange: (e) => show(e.target.value) });
+        show(obj[f.key]);
+        return field(f.label, h('div', { class: 'vidf' }, input, preview, status), f.hint, 'f--image', 'div');
       }
       case 'strings': return field(f.label, stringsEditor(obj, f.key), f.hint, '', 'div');
       case 'image': return field(f.label, imageEditor(obj, f.key), f.hint, 'f--image', 'div');

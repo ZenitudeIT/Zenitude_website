@@ -41,6 +41,44 @@ window.ZenSite = { init() {
     if (target) setTimeout(() => target.scrollIntoView({ behavior: 'instant', block: 'start' }), 60);
   }
 
+  /* ---------- hero background video ---------- */
+  const heroVideo = $('.hero__media');
+  if (heroVideo) {
+    const hero = heroVideo.closest('.hero');
+    const saveData = navigator.connection && navigator.connection.saveData;
+    const toggleBtn = $('[data-video="toggle"]', hero);
+    const soundBtn = $('[data-video="sound"]', hero);
+    // Respect "reduce motion" and data-saver: keep the poster / design, no video download.
+    if (!reduceMotion && !saveData) {
+      const small = matchMedia('(max-width: 768px)').matches;
+      heroVideo.src = (small && heroVideo.dataset.srcMobile) || heroVideo.dataset.src;
+      heroVideo.muted = true; // browsers only autoplay muted videos
+      let userPaused = false;
+      const setPlaying = (on) => {
+        hero.classList.toggle('is-video-paused', !on);
+        if (toggleBtn) toggleBtn.setAttribute('aria-label', on ? 'Pause background video' : 'Play background video');
+      };
+      const tryPlay = () => heroVideo.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      heroVideo.addEventListener('playing', () => { hero.classList.add('is-video-ready'); if (toggleBtn) toggleBtn.hidden = false; if (soundBtn) soundBtn.hidden = false; });
+      heroVideo.addEventListener('error', () => hero.classList.add('is-video-failed'));
+      tryPlay();
+      if (toggleBtn) toggleBtn.addEventListener('click', () => {
+        if (heroVideo.paused) { userPaused = false; tryPlay(); } else { userPaused = true; heroVideo.pause(); setPlaying(false); }
+      });
+      if (soundBtn) soundBtn.addEventListener('click', () => {
+        heroVideo.muted = !heroVideo.muted;
+        hero.classList.toggle('is-video-sound', !heroVideo.muted);
+        soundBtn.setAttribute('aria-label', heroVideo.muted ? 'Turn sound on' : 'Turn sound off');
+        if (!heroVideo.muted && heroVideo.paused) tryPlay();
+      });
+      // Save battery/CPU: pause while the hero is off-screen.
+      new IntersectionObserver(([en]) => {
+        if (en.isIntersecting) { if (!userPaused && heroVideo.paused) tryPlay(); }
+        else if (!heroVideo.paused) heroVideo.pause();
+      }, { threshold: 0.15 }).observe(hero);
+    }
+  }
+
   /* ---------- stays: keep the selected coast tab visible on small screens ---------- */
   const activeTab = $('.coast-tab.is-active');
   if (activeTab) {

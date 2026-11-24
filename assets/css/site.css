@@ -883,3 +883,44 @@ button { font: inherit; background: none; border: 0; color: inherit; }
 @media (max-width: 600px) {
   .coast-tabs__label { display: none; }
 }
+
+/* =========================================================
+   HERO BACKGROUND VIDEO
+   ========================================================= */
+.hero--video { background: var(--moss-ink) var(--poster, none) center / cover no-repeat; }
+.hero__video { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+.hero__media {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transform: scale(1.04);
+  transition: opacity 1.6s var(--ease), transform 8s var(--ease);
+}
+.hero--video.is-video-ready .hero__media { opacity: 1; transform: none; }
+.hero--video .hero__bg { z-index: 1; }
+/* legibility veil over the footage, in the brand's moss tones */
+.hero--video .hero__bg::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(15, 34, 17, .55) 0%, rgba(15, 34, 17, .15) 35%, rgba(15, 34, 17, .25) 60%, rgba(15, 34, 17, .85) 100%),
+    linear-gradient(90deg, rgba(15, 34, 17, .55) 0%, rgba(15, 34, 17, 0) 65%);
+}
+.hero--video .hero__watermark { opacity: .035; }
+.hero--video .hero__waves { display: none; }
+.hero--video::after { z-index: 1; }
+.hero--video .hero__content, .hero--video .hero__scroll { z-index: 2; }
+.hero--video .hero__title { text-shadow: 0 2px 30px rgba(0, 0, 0, .25); }
+
+.hero__vctrl { position: absolute; right: clamp(1rem, 3vw, 2.4rem); bottom: 2.2rem; z-index: 3; display: flex; gap: .6rem; }
+.hero__vbtn {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid rgba(248, 245, 239, .4); background: rgba(15, 34, 17, .3);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: background .3s, border-color .3s;
+}
+.hero__vbtn:hover { background: var(--gold); border-color: var(--gold); }
+.hero__vbtn svg { width: 18px; height: 18px; fill: none; stroke: var(--ivory); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.hero__vbtn .i-play, .is-video-paused .hero__vbtn .i-pause { display: none; }
+.is-video-paused .hero__vbtn .i-play { display: inline; }
+.hero__vbtn .i-on, .is-video-sound .hero__vbtn .i-off { display: none; }
+.is-video-sound .hero__vbtn .i-on { display: inline; }
+@media (max-width: 600px) { .hero__vctrl { bottom: 1.2rem; } }

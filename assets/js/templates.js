@@ -18,6 +18,13 @@
     if (/^[a-z][a-z0-9+.-]*:/i.test(src)) return ''; // block javascript:, etc.
     return src.replace(/^\/+/, '');
   };
+  const vidSrc = (src) => {
+    src = String(src || '').trim();
+    if (!src) return '';
+    if (/^https?:\/\//i.test(src)) return src;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(src)) return '';
+    return src.replace(/^\/+/, '');
+  };
   const cssUrl = (u) => `url('${String(u).replace(/['"()\\\s]/g, (c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))}')`;
   const safeUrl = (u) => (/^(https?:\/\/|mailto:|tel:)/i.test(String(u || '').trim()) ? String(u).trim() : '');
   const pub = (arr) => (arr || []).filter((x) => x && x.published !== false);
@@ -172,8 +179,15 @@
     const pos = { north: 'n', east: 'e', south: 's', west: 'w' }, rot = { north: 0, east: 90, south: 180, west: 270 };
     const r0 = regions[0] || {};
     const marquee = H.marquee || [];
+    const video = vidSrc(H.heroVideo);
+    const videoMobile = vidSrc(H.heroVideoMobile);
+    const poster = img(H.heroPoster);
     return `
-    <section class="hero">
+    <section class="hero${video ? ' hero--video' : ''}"${video && poster ? ` style="${esc('--poster:' + cssUrl(poster))}"` : ''}>
+      ${video ? `
+      <div class="hero__video" aria-hidden="true">
+        <video class="hero__media" muted loop playsinline preload="metadata"${poster ? ` poster="${esc(poster)}"` : ''} data-src="${esc(video)}"${videoMobile ? ` data-src-mobile="${esc(videoMobile)}"` : ''}></video>
+      </div>` : ''}
       <div class="hero__bg" aria-hidden="true">
         <img src="${A}emblem-white.png" alt="" class="hero__watermark" />
         <svg class="hero__waves" viewBox="0 0 1440 320" preserveAspectRatio="none">
@@ -192,6 +206,16 @@
         </div>
       </div>
       <a href="#about" class="hero__scroll" aria-label="Scroll to content"><span>Scroll</span><i></i></a>
+      ${video ? `
+      <div class="hero__vctrl">
+        <button type="button" class="hero__vbtn" data-video="toggle" aria-label="Pause background video" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" d="M8 5v14M16 5v14"/><path class="i-play" d="M8 5l11 7-11 7z"/></svg>
+        </button>
+        ${H.heroVideoSound === 'yes' ? `
+        <button type="button" class="hero__vbtn" data-video="sound" aria-label="Turn sound on" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="i-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="i-off" d="M17 9l5 6M22 9l-5 6"/></svg>
+        </button>` : ''}
+      </div>` : ''}
     </section>
 
     ${marquee.length ? `<div class="marquee" aria-hidden="true"><div class="marquee__track">${[...marquee, ...marquee].map((m) => `<span>${esc(m)}</span><b>✦</b>`).join('')}</div></div>` : ''}
