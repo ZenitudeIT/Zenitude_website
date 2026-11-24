@@ -947,3 +947,10 @@ button { font: inherit; background: none; border: 0; color: inherit; }
 @media (max-width: 600px) {
   .hero__content { min-height: calc(100svh - var(--header-h) - 4rem); }
 }
+
+/* Team: everyone at the same size, one row of up to three, centred */
+.members--1 { grid-template-columns: minmax(0, 380px); justify-content: center; }
+.members--2 { grid-template-columns: repeat(2, minmax(0, 380px)); justify-content: center; }
+.member__photo > img:first-child { object-position: center 20%; }
+@media (max-width: 960px) { .members--2 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .members--1, .members--2 { grid-template-columns: 1fr; } }

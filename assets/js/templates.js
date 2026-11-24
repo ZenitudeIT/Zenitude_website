@@ -377,7 +377,6 @@
   function pageTeam(c) {
     const H = c.home || {};
     const team = pub(c.team);
-    const lead = team.shift();
     document.title = 'Our Team — ' + (c.settings.siteName || 'Zenitude Concierge');
     return `
     <section class="page-hero page-hero--plain">
@@ -389,22 +388,10 @@
         <p class="page-hero__lead reveal">${esc(H.teamText)}</p>
       </div>
     </section>
-    ${lead ? `
-    <section class="section lead-member">
-      <div class="container lead-member__grid">
-        <div class="lead-member__photo reveal">${frame(lead.photo, lead.name)}</div>
-        <div class="lead-member__text">
-          <p class="eyebrow reveal">${esc(lead.role)}</p>
-          <h2 class="section__title reveal">${esc(lead.name)}</h2>
-          ${paras(lead.bio, 'lead-member__bio reveal')}
-          <img src="${A}emblem-gold.png" alt="" class="lead-member__mark reveal" />
-        </div>
-      </div>
-    </section>` : ''}
     <section class="section section--cream">
       <div class="container">
-        <div class="section__head"><p class="eyebrow reveal">Leadership &amp; specialists</p><h2 class="section__title reveal">Experience you can <em>rely on</em></h2></div>
-        <div class="members">${team.map((m) => `
+        <div class="section__head"><p class="eyebrow reveal">Our leadership</p><h2 class="section__title reveal">Experience you can <em>rely on</em></h2></div>
+        <div class="members members--${Math.min(team.length, 3)}">${team.map((m) => `
           <article class="member reveal" tabindex="0">
             <div class="member__photo${img(m.photo) ? '' : ' frame--fallback'}">
               ${img(m.photo) ? `<img src="${esc(img(m.photo))}" alt="${esc(m.name)}" loading="lazy" data-fallback />` : '<img alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />'}

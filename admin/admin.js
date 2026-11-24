@@ -154,7 +154,7 @@
         IMG('heroImage', 'Header image'), highlights, gallery],
     },
     team: {
-      title: 'Team', icon: '☺', kind: 'list', desc: 'The first visible person is featured at the top of the Team page.',
+      title: 'Team', icon: '☺', kind: 'list', desc: 'Everyone visible is shown side by side, at the same size, in the order of this list.',
       item: { name: 'New team member', role: '', published: false, photo: '', bio: '' }, labelKey: 'name', thumbKey: 'photo', subKey: 'role', itemName: 'team member',
       fields: [T('name', 'Full name'), T('role', 'Job title'), TOG('published', 'Visible on website'), IMG('photo', 'Photo', { hint: 'Portrait photos work best; the face should be near the top.' }), TA('bio', 'Biography', { rows: 4 })],
     },
